@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DIP</string>
+    <string name="title_home">Главная</string>
+    <string name="title_dashboard">Личный кабинет</string>
+    <string name="title_notifications">Уведомления</string>
+    <string name="title_settings">Настройки</string>
+</resources>
