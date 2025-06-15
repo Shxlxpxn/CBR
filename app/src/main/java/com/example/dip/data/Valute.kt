@@ -6,18 +6,18 @@ import org.simpleframework.xml.Root
 
 @Root(name = "ValCurs", strict = false)
 data class ValCurs(
-    @field:ElementList(name = "Valute", inline = true)
-    var valuteList: List<Valute>? = null
+    @field:ElementList(inline = true, name = "Valute")
+    val valute: List<Valute>
 )
 
 @Root(name = "Valute", strict = false)
 data class Valute(
     @field:Element(name = "CharCode")
-    var charCode: String = "",
+    val charCode: String,
 
     @field:Element(name = "Value")
-    var value: String = "",
-
-    @field:Element(name = "Nominal")
-    var nominal: Int = 1
-)
+    val value: String
+) {
+    val valueDouble: Double
+        get() = value.replace(",", ".").toDouble()
+}

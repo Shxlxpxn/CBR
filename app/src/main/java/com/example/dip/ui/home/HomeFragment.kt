@@ -1,7 +1,7 @@
 package com.example.dip.ui.home
 
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,18 +9,23 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.dip.App
 import com.example.dip.R
 import com.example.dip.data.rv_adapters.ConversionsAdapter
 import com.example.dip.databinding.FragmentHomeBinding
+import javax.inject.Inject
 
 class HomeFragment : Fragment() {
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private lateinit var viewModel: HomeViewModel
+
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-
-    private val viewModel: HomeViewModel by viewModels()
 
     private val availableCurrencies = listOf(
         "RUB", "USD", "EUR", "CNY", "KZT", "GBP", "JPY", "CHF", "AUD", "CAD"
@@ -30,6 +35,18 @@ class HomeFragment : Fragment() {
     private val selectedCurrencies = mutableSetOf<String>()
 
     private lateinit var conversionsAdapter: ConversionsAdapter
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        // Внедрение зависимостей через Dagger
+        (requireActivity().application as App).appComponent.inject(this)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Получаем ViewModel с помощью инжектированного фабричного провайдера
+        viewModel = ViewModelProvider(this, viewModelFactory)[HomeViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -99,7 +116,7 @@ class HomeFragment : Fragment() {
             binding.textHome.text = error?.let { "Ошибка: $it" } ?: ""
         }
 
-        viewModel.loadCurrencyRates()
+        viewModel.getCurrencyRates()
     }
 
     private fun updateConversions() {
@@ -122,7 +139,6 @@ class HomeFragment : Fragment() {
 
         binding.textHome.text = "Курсы валют относительно $selectedBaseCurrency"
         conversionsAdapter.setConversions(conversions)
-        Log.d("Conversions", "Данные для обновления: $conversions")
     }
 
     override fun onDestroyView() {
@@ -130,5 +146,3 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 }
-
-
