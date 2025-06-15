@@ -1,61 +1,74 @@
 package com.example.dip
 
 import android.os.Bundle
-import android.widget.TextView
+import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.dip.data.ValCurs
 import com.example.dip.databinding.ActivityMainBinding
-import com.example.dip.di.modules.RetrofitClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.dip.ui.home.HomeViewModel
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var textView: TextView
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val viewModel: HomeViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Инжектим зависимости из Dagger
+        (application as App).appComponent.inject(this)
+
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        textView = findViewById(R.id.textView)
-        textView.text = "Загрузка..."
+        // Изначальный текст
+        binding.textView.text = "Загрузка..."
 
-        // Делаем запрос
-        RetrofitClient.instance.getCurrencyRates().enqueue(object : Callback<ValCurs> {
-            override fun onResponse(call: Call<ValCurs>, response: Response<ValCurs>) {
-                if (response.isSuccessful) {
-                    val valCurs = response.body()
-                    val usd = valCurs?.valuteList?.find { it.charCode == "USD" }
-
-                    if (usd != null) {
-                        textView.text = "Курс USD: ${usd.value} руб."
-                    } else {
-                        textView.text = "Курс USD не найден"
-                    }
-                } else {
-                    textView.text = "Ошибка: ${response.code()}"
-                }
+        // Подписываемся на LiveData из ViewModel для курсов валют
+        viewModel.currencyMap.observe(this) { ratesMap ->
+            val usdRate = ratesMap["USD"]
+            if (usdRate != null) {
+                binding.textView.text = "Курс USD: $usdRate руб."
+            } else {
+                binding.textView.text = "Курс USD не найден"
             }
+        }
 
-            override fun onFailure(call: Call<ValCurs>, t: Throwable) {
-                textView.text = "Ошибка загрузки"
+        viewModel.error.observe(this) { errorMsg ->
+            if (errorMsg != null) {
+                binding.textView.text = "Ошибка: $errorMsg"
+            }
+        }
 
+        viewModel.loading.observe(this) { isLoading ->
+            if (isLoading) {
+                binding.textView.text = "Загрузка..."
+            }
+        }
+
+        // Запускаем загрузку курсов валют через ViewModel
+        viewModel.getCurrencyRates()
+
+        // NavController и BottomNavigationView
         val navView: BottomNavigationView = binding.navView
-
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications, R.id.navigation_settings
+                R.id.navigation_home,
+                R.id.navigation_dashboard,
+                R.id.navigation_notifications,
+                R.id.navigation_settings
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
-        })}}
+}
