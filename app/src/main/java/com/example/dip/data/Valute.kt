@@ -16,5 +16,8 @@ data class Valute(
     var charCode: String = "",
 
     @field:Element(name = "Value")
-    var value: String = ""
+    var value: String = "",
+
+    @field:Element(name = "Nominal")
+    var nominal: Int = 1
 )
