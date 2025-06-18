@@ -56,17 +56,16 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-simplexml:2.9.0") // так как ЦБ РФ отдает XML
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     implementation ("com.google.android.material:material:1.9.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
+    // Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-
+    implementation ("com.squareup.retrofit2:converter-simplexml:2.9.0") // так как ЦБ РФ отдает XML
     // Dagger 2
-    implementation ("com.google.dagger:dagger:2.45")
-    kapt ("com.google.dagger:dagger-compiler:2.45")
+    implementation ("com.google.dagger:dagger:2.56.2")
+    kapt ("com.google.dagger:dagger-compiler:2.56.2")
 
 }

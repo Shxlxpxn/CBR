@@ -5,19 +5,21 @@ import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Root
 
 @Root(name = "ValCurs", strict = false)
-data class ValCurs(
+class ValCurs {
+
     @field:ElementList(inline = true, name = "Valute")
-    val valute: List<Valute>
-)
+    var valute: List<Valute> = mutableListOf()
+}
 
 @Root(name = "Valute", strict = false)
-data class Valute(
+class Valute {
+
     @field:Element(name = "CharCode")
-    val charCode: String,
+    var charCode: String = ""
 
     @field:Element(name = "Value")
-    val value: String
-) {
+    var value: String = ""
+
     val valueDouble: Double
         get() = value.replace(",", ".").toDouble()
 }
