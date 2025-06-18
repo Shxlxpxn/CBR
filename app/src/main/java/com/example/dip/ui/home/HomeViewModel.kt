@@ -1,10 +1,11 @@
 package com.example.dip.ui.home
 
-import CbrApi
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dip.data.CbrApi
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

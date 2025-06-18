@@ -22,17 +22,20 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: HomeViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Инжектим зависимости из Dagger
         (application as App).appComponent.inject(this)
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Изначальный текст
-        binding.textView.text = "Загрузка..."
+        // Устанавливаем Toolbar как ActionBar
+        setSupportActionBar(findViewById(R.id.toolbar))
 
-        // Подписываемся на LiveData из ViewModel для курсов валют
+        // Можно динамически менять заголовок (например, по навигации)
+        supportActionBar?.title = "Главная"
+        supportActionBar?.setDisplayHomeAsUpEnabled(false) // если нужна стрелка назад - включить
+
+        // Твой остальной код
+        binding.textView.text = "Загрузка..."
         viewModel.currencyMap.observe(this) { ratesMap ->
             val usdRate = ratesMap["USD"]
             if (usdRate != null) {
@@ -54,10 +57,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Запускаем загрузку курсов валют через ViewModel
         viewModel.getCurrencyRates()
 
-        // NavController и BottomNavigationView
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         val appBarConfiguration = AppBarConfiguration(
@@ -72,3 +73,4 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 }
+

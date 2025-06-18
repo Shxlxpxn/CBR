@@ -1,22 +1,22 @@
 package com.example.dip.di.modules
 
-
-import CbrApi
+import com.example.dip.data.CbrApi
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+
 import javax.inject.Singleton
 
 @Module
 class NetworkModule {
+    private val BASE_URL = "https://www.cbr.ru/"
 
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://www.cbr-xml-daily.ru/") // твой базовый URL
-            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .addConverterFactory(retrofit2.converter.simplexml.SimpleXmlConverterFactory.create())
             .build()
     }
 
