@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dip.data.CbrApi
+import com.example.dip.data.api.CbrApi
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,5 +38,8 @@ class HomeViewModel @Inject constructor(
                 _loading.value = false
             }
         }
+    }
+    fun setCurrencyMap(map: Map<String, Double>) {
+        _currencyMap.value = map
     }
 }

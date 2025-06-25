@@ -1,10 +1,9 @@
 package com.example.dip.di.modules
 
-import com.example.dip.data.CbrApi
+import com.example.dip.data.api.CbrApi
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
-
 import javax.inject.Singleton
 
 @Module
