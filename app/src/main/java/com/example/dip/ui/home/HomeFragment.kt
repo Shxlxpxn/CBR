@@ -15,15 +15,15 @@ import com.example.dip.App
 import com.example.dip.R
 import com.example.dip.data.rv_adapters.ConversionsAdapter
 import com.example.dip.databinding.FragmentHomeBinding
+import com.example.dip.ui.viewmodel.CurrencyViewModel
 import javax.inject.Inject
 
 class HomeFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-
     private lateinit var viewModel: HomeViewModel
-
+    private lateinit var currencyViewModel: CurrencyViewModel
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -46,6 +46,7 @@ class HomeFragment : Fragment() {
         super.onCreate(savedInstanceState)
         // Получаем ViewModel с помощью инжектированного фабричного провайдера
         viewModel = ViewModelProvider(this, viewModelFactory)[HomeViewModel::class.java]
+        currencyViewModel = ViewModelProvider(this, viewModelFactory)[CurrencyViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -105,18 +106,20 @@ class HomeFragment : Fragment() {
                 .setNegativeButton("Отмена", null)
                 .show()
         }
-
         // Обновляем список при изменениях данных
-        viewModel.currencyMap.observe(viewLifecycleOwner) { ratesMap ->
-            if (ratesMap != null) {
-                updateConversions()
-            }
+        currencyViewModel.currencies.observe(viewLifecycleOwner) { currencyList ->
+            val map = currencyList.associate { it.charCode to it.value }
+            viewModel.setCurrencyMap(map)
         }
-        viewModel.error.observe(viewLifecycleOwner) { error ->
+        // 🔄 Ошибки
+        currencyViewModel.error.observe(viewLifecycleOwner) { error ->
             binding.textHome.text = error?.let { "Ошибка: $it" } ?: ""
         }
 
-        viewModel.getCurrencyRates()
+         currencyViewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+        }
+        // Загрузка данных
+        currencyViewModel.loadCurrencies(forceRefresh = true)
     }
 
     private fun updateConversions() {

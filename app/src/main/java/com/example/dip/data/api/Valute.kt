@@ -1,15 +1,7 @@
-package com.example.dip.data
+package com.example.dip.data.api
 
 import org.simpleframework.xml.Element
-import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Root
-
-@Root(name = "ValCurs", strict = false)
-class ValCurs {
-
-    @field:ElementList(inline = true, name = "Valute")
-    var valute: List<Valute> = mutableListOf()
-}
 
 @Root(name = "Valute", strict = false)
 class Valute {
@@ -17,9 +9,21 @@ class Valute {
     @field:Element(name = "CharCode")
     var charCode: String = ""
 
+    @field:Element(name = "Name")
+    var name: String = ""
+
+    @field:Element(name = "Nominal")
+    var nominal: Int = 1
+
     @field:Element(name = "Value")
     var value: String = ""
 
+    @field:Element(name = "Previous")
+    var previous: String = ""
+
     val valueDouble: Double
         get() = value.replace(",", ".").toDouble()
+
+    val previousDouble: Double
+        get() = previous.replace(",", ".").toDouble()
 }
