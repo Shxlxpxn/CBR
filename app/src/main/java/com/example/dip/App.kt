@@ -6,7 +6,6 @@ import com.example.dip.di.DaggerAppComponent
 
 class App : Application() {
 
-    // Инициализируем компонент Dagger один раз при запуске приложения
     val appComponent: AppComponent by lazy {
         DaggerAppComponent.builder()
             .applicationContext(this)

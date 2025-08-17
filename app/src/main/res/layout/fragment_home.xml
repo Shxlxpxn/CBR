@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:background="@android:color/white">
-    <!-- Заголовок выбора базовой валюты -->
+
     <TextView
         android:id="@+id/text_select_currency"
         android:layout_width="0dp"
@@ -16,62 +16,93 @@
         android:textStyle="bold"
         android:textColor="#333"
         android:gravity="center"
-        android:layout_marginTop="36dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="8dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Спиннер выбора базовой валюты -->
     <Spinner
         android:id="@+id/spinnerFromCurrency"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginTop="8dp"
         android:background="@drawable/spinner_background"
         app:layout_constraintTop_toBottomOf="@id/text_select_currency"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="16dp" />
 
-    <!-- Кнопка выбора нескольких валют -->
     <Button
         android:id="@+id/button_select_currencies"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Выбрать валюты для конвертации"
-        android:layout_marginTop="16dp"
+        android:text="Выбрать валюты"
         android:backgroundTint="#0066cc"
         android:textColor="@android:color/white"
         android:paddingVertical="12dp"
         android:textAllCaps="false"
-        android:elevation="4dp"
+        android:elevation="2dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@id/spinnerFromCurrency"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="16dp" />
 
-    <!-- Список конвертаций -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewConversions"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:clipToPadding="false"
         android:paddingBottom="8dp"
         app:layout_constraintTop_toBottomOf="@id/button_select_currencies"
+        app:layout_constraintBottom_toTopOf="@id/pagination_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/pagination_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="8dp"
         app:layout_constraintBottom_toTopOf="@id/text_home"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- Текст для отображения курса или ошибок -->
+        <ProgressBar
+            android:id="@+id/progress_pagination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/button_load_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Загрузить ещё"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#0066cc"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/text_home"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textColor="#555"
         android:gravity="center"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="16dp"
+        android:paddingHorizontal="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+

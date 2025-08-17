@@ -1,10 +1,12 @@
 package com.example.dip.data.dao
 
+import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.dip.data.CurrencyEntity
 
+@Dao
 interface CurrencyDao {
 
     @Query("SELECT * FROM currencies")

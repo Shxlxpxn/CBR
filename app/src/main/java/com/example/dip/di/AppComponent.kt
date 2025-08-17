@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.dip.MainActivity
 import com.example.dip.di.modules.DatabaseModule
 import com.example.dip.di.modules.NetworkModule
-import com.example.dip.ui.ViewModel.ViewModelModule
+import com.example.dip.ui.viewmodel.ViewModelModule
 import com.example.dip.ui.home.HomeFragment
 import dagger.BindsInstance
 import dagger.Component
