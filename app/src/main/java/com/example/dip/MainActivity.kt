@@ -30,11 +30,9 @@ class MainActivity : AppCompatActivity() {
         // Устанавливаем Toolbar как ActionBar
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        // Можно динамически менять заголовок (например, по навигации)
         supportActionBar?.title = "Главная"
-        supportActionBar?.setDisplayHomeAsUpEnabled(false) // если нужна стрелка назад - включить
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
-        // Твой остальной код
         binding.textView.text = "Загрузка..."
         viewModel.currencyMap.observe(this) { ratesMap ->
             val usdRate = ratesMap["USD"]

@@ -22,8 +22,11 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    // Если хочешь сохранить HomeViewModel — оставляем, но логика теперь локально использует currencyViewModel
     private lateinit var viewModel: HomeViewModel
     private lateinit var currencyViewModel: CurrencyViewModel
+
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -36,15 +39,21 @@ class HomeFragment : Fragment() {
 
     private lateinit var conversionsAdapter: ConversionsAdapter
 
+    // пагинация
+    private var currentPage = 0
+    private val pageSize = 5
+    private var conversionsList: List<Pair<String, Double>> = emptyList()
+
+    // локальная мапа курсов (charCode -> value)
+    private var ratesMap: Map<String, Double> = emptyMap()
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        // Внедрение зависимостей через Dagger
         (requireActivity().application as App).appComponent.inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Получаем ViewModel с помощью инжектированного фабричного провайдера
         viewModel = ViewModelProvider(this, viewModelFactory)[HomeViewModel::class.java]
         currencyViewModel = ViewModelProvider(this, viewModelFactory)[CurrencyViewModel::class.java]
     }
@@ -60,29 +69,26 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Спиннер базовой валюты
+        // Spinner
         val baseAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item, availableCurrencies)
         binding.spinnerFromCurrency.adapter = baseAdapter
         binding.spinnerFromCurrency.setSelection(availableCurrencies.indexOf(selectedBaseCurrency))
         binding.spinnerFromCurrency.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?, view: View?, position: Int, id: Long
-            ) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 selectedBaseCurrency = availableCurrencies[position]
-                updateConversions()
+                updateConversionsAndShowPage()
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
-        // Адаптер для курсов валют
+        // RecyclerView + adapter
         conversionsAdapter = ConversionsAdapter()
         binding.recyclerViewConversions.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = conversionsAdapter
         }
 
-        // Кнопка выбора валют с диалогом
+        // Выбор валют (мультивыбор)
         binding.buttonSelectCurrencies.setOnClickListener {
             val currenciesArray = availableCurrencies.toTypedArray()
             val tempSelected = selectedCurrencies.toMutableSet()
@@ -91,57 +97,98 @@ class HomeFragment : Fragment() {
             AlertDialog.Builder(requireContext())
                 .setTitle("Выберите валюты")
                 .setMultiChoiceItems(currenciesArray, checkedItems) { _, which, isChecked ->
-                    if (isChecked) {
-                        tempSelected.add(currenciesArray[which])
-                    } else {
-                        tempSelected.remove(currenciesArray[which])
-                    }
+                    if (isChecked) tempSelected.add(currenciesArray[which])
+                    else tempSelected.remove(currenciesArray[which])
                 }
                 .setPositiveButton("OK") { dialog, _ ->
                     selectedCurrencies.clear()
                     selectedCurrencies.addAll(tempSelected)
-                    updateConversions()
+                    currentPage = 0
+                    updateConversionsAndShowPage()
                     dialog.dismiss()
                 }
                 .setNegativeButton("Отмена", null)
                 .show()
         }
-        // Обновляем список при изменениях данных
-        currencyViewModel.currencies.observe(viewLifecycleOwner) { currencyList ->
-            val map = currencyList.associate { it.charCode to it.value }
-            viewModel.setCurrencyMap(map)
+
+        // Кнопка "Загрузить ещё"
+        binding.buttonLoadMore.setOnClickListener {
+            val maxPage = if (conversionsList.isEmpty()) 0 else (conversionsList.size - 1) / pageSize
+            if (currentPage < maxPage) {
+                currentPage++
+                showCurrentPage()
+            }
         }
-        // 🔄 Ошибки
+
+        // Наблюдаем за списком валют из CurrencyViewModel (Repository -> Room/API)
+        currencyViewModel.currencies.observe(viewLifecycleOwner) { currencyList ->
+            // обновляем локальную мапу курсов
+            ratesMap = currencyList.associate { it.charCode to it.value }
+            // обновляем UI
+            updateConversionsAndShowPage()
+        }
+
+        // Ошибки
         currencyViewModel.error.observe(viewLifecycleOwner) { error ->
             binding.textHome.text = error?.let { "Ошибка: $it" } ?: ""
         }
 
-         currencyViewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+        // Показать/скрыть индикатор в пагинации
+        currencyViewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+            binding.progressPagination.visibility = if (loading) View.VISIBLE else View.GONE
+            // при загрузке скрываем кнопку загрузки
+            binding.buttonLoadMore.visibility = if (!loading && hasMorePages()) View.VISIBLE else View.GONE
         }
-        // Загрузка данных
+
+        // Инициируем загрузку
         currencyViewModel.loadCurrencies(forceRefresh = true)
     }
 
-    private fun updateConversions() {
-        val ratesMap = viewModel.currencyMap.value ?: return
-
+    // строим conversionsList из выбранных валют и локальной ratesMap
+    private fun updateConversionsAndShowPage() {
         if (selectedCurrencies.isEmpty()) {
+            conversionsList = emptyList()
             binding.textHome.text = "Выберите хотя бы одну валюту для конвертации"
             conversionsAdapter.setConversions(emptyList())
+            binding.buttonLoadMore.visibility = View.GONE
             return
         }
 
         val baseRate = ratesMap[selectedBaseCurrency] ?: 1.0
 
-        val conversions = selectedCurrencies.mapNotNull { currency ->
+        conversionsList = selectedCurrencies.mapNotNull { currency ->
             val rate = ratesMap[currency]
-            if (rate != null) {
-                currency to (rate / baseRate)
-            } else null
+            if (rate != null) currency to (rate / baseRate) else null
+        }.sortedBy { it.first } // сортировка для стабильности
+
+        currentPage = 0
+        showCurrentPage()
+    }
+
+    private fun showCurrentPage() {
+        val fromIndex = currentPage * pageSize
+        val toIndex = minOf(fromIndex + pageSize, conversionsList.size)
+        val pageData = if (fromIndex < toIndex) conversionsList.subList(fromIndex, toIndex) else emptyList()
+
+        binding.textHome.text = if (conversionsList.isEmpty()) {
+            "Нет данных для выбранных валют"
+        } else {
+            "Курсы валют относительно $selectedBaseCurrency (стр. ${currentPage + 1}/${maxPages()})"
         }
 
-        binding.textHome.text = "Курсы валют относительно $selectedBaseCurrency"
-        conversionsAdapter.setConversions(conversions)
+        conversionsAdapter.setConversions(pageData)
+
+        // Показать/скрыть кнопку "Загрузить ещё"
+        binding.buttonLoadMore.visibility = if (hasMorePages()) View.VISIBLE else View.GONE
+    }
+
+    private fun hasMorePages(): Boolean {
+        val maxPage = if (conversionsList.isEmpty()) 0 else (conversionsList.size - 1) / pageSize
+        return currentPage < maxPage
+    }
+
+    private fun maxPages(): Int {
+        return if (conversionsList.isEmpty()) 1 else ((conversionsList.size - 1) / pageSize) + 1
     }
 
     override fun onDestroyView() {

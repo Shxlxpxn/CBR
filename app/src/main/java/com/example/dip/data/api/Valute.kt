@@ -18,7 +18,7 @@ class Valute {
     @field:Element(name = "Value")
     var value: String = ""
 
-    @field:Element(name = "Previous")
+    @field:Element(name = "Previous", required = false)
     var previous: String = ""
 
     val valueDouble: Double

@@ -1,4 +1,4 @@
-package com.example.dip.ui.ViewModel
+package com.example.dip.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -11,10 +11,9 @@ import kotlin.collections.iterator
 class ViewModelFactory @Inject constructor(
     private val creators: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>>
 ) : ViewModelProvider.Factory {
-
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         var creator: Provider<out ViewModel>? = creators[modelClass]
-        if (creator == null) { // support inheritance
+        if (creator == null) {
             for ((key, value) in creators) {
                 if (modelClass.isAssignableFrom(key)) {
                     creator = value

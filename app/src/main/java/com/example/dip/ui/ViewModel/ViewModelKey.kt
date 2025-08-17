@@ -1,4 +1,4 @@
-package com.example.dip.ui.ViewModel
+package com.example.dip.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import dagger.MapKey
