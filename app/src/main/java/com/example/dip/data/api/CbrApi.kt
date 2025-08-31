@@ -1,4 +1,5 @@
-import com.example.dip.data.ValCurs
+package com.example.dip.data.api
+
 import retrofit2.http.GET
 
 interface CbrApi {

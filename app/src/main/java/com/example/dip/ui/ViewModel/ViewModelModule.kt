@@ -1,4 +1,4 @@
-package com.example.dip.ui.dashboard
+package com.example.dip.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -17,4 +17,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(HomeViewModel::class)
     abstract fun bindHomeViewModel(homeViewModel: HomeViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(CurrencyViewModel::class)
+    abstract fun bindCurrencyViewModel(viewModel: CurrencyViewModel): ViewModel
 }

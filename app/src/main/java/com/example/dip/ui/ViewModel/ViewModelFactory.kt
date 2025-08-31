@@ -1,19 +1,19 @@
-package com.example.dip.ui.dashboard
+package com.example.dip.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
+import kotlin.collections.iterator
 
 @Singleton
 class ViewModelFactory @Inject constructor(
     private val creators: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>>
 ) : ViewModelProvider.Factory {
-
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         var creator: Provider<out ViewModel>? = creators[modelClass]
-        if (creator == null) { // support inheritance
+        if (creator == null) {
             for ((key, value) in creators) {
                 if (modelClass.isAssignableFrom(key)) {
                     creator = value
