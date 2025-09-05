@@ -22,40 +22,14 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: HomeViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (application as App).appComponent.inject(this)
         super.onCreate(savedInstanceState)
+        (application as App).appComponent.inject(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Устанавливаем Toolbar как ActionBar
         setSupportActionBar(findViewById(R.id.toolbar))
-
         supportActionBar?.title = "Главная"
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
-
-        binding.textView.text = "Загрузка..."
-        viewModel.currencyMap.observe(this) { ratesMap ->
-            val usdRate = ratesMap["USD"]
-            if (usdRate != null) {
-                binding.textView.text = "Курс USD: $usdRate руб."
-            } else {
-                binding.textView.text = "Курс USD не найден"
-            }
-        }
-
-        viewModel.error.observe(this) { errorMsg ->
-            if (errorMsg != null) {
-                binding.textView.text = "Ошибка: $errorMsg"
-            }
-        }
-
-        viewModel.loading.observe(this) { isLoading ->
-            if (isLoading) {
-                binding.textView.text = "Загрузка..."
-            }
-        }
-
-        viewModel.getCurrencyRates()
 
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
@@ -69,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        viewModel.getCurrencyRates()
     }
 }
 

@@ -39,7 +39,10 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+
     fun setCurrencyMap(map: Map<String, Double>) {
         _currencyMap.value = map
     }
+
 }

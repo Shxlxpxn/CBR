@@ -2,6 +2,7 @@ package com.example.dip.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.dip.ui.CurrencyViewModel
 import com.example.dip.ui.home.HomeViewModel
 import dagger.Binds
 import dagger.Module
