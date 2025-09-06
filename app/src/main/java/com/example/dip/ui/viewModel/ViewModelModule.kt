@@ -2,7 +2,6 @@ package com.example.dip.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.dip.ui.CurrencyViewModel
 import com.example.dip.ui.home.HomeViewModel
 import dagger.Binds
 import dagger.Module
@@ -18,9 +17,4 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(HomeViewModel::class)
     abstract fun bindHomeViewModel(homeViewModel: HomeViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(CurrencyViewModel::class)
-    abstract fun bindCurrencyViewModel(viewModel: CurrencyViewModel): ViewModel
 }

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -35,6 +36,7 @@ class HomeFragment : Fragment() {
 
     private var selectedBaseCurrency = "RUB"
     private val selectedCurrencies = mutableSetOf<String>()
+    private val favoriteCurrencies = mutableSetOf<String>()
 
     private lateinit var conversionsAdapter: ConversionsAdapter
 
@@ -109,11 +111,33 @@ class HomeFragment : Fragment() {
                 .show()
         }
 
-        // Кнопка "Загрузить ещё"
+        binding.buttonFavorites.setOnClickListener {
+            if (favoriteCurrencies.isNotEmpty()) {
+                selectedCurrencies.clear()
+                selectedCurrencies.addAll(favoriteCurrencies)
+                updateConversionsAndShowPage()
+            } else {
+                Toast.makeText(requireContext(), "Избранные валюты не выбраны", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.buttonAddToFavorites.setOnClickListener {
+            favoriteCurrencies.clear()
+            favoriteCurrencies.addAll(selectedCurrencies)
+            Toast.makeText(requireContext(), "Избранные валюты сохранены", Toast.LENGTH_SHORT).show()
+        }
+
+        // Кнопки пагинации
         binding.buttonLoadMore.setOnClickListener {
             val maxPage = if (conversionsList.isEmpty()) 0 else (conversionsList.size + 1) / pageSize
             if (currentPage < maxPage) {
                 currentPage++
+                showCurrentPage()
+            }
+        }
+        binding.buttonLoadPrev.setOnClickListener {
+            if (currentPage > 0) {
+                currentPage--
                 showCurrentPage()
             }
         }
@@ -167,17 +191,15 @@ class HomeFragment : Fragment() {
         }
 
         conversionsAdapter.setConversions(pageData)
-        binding.buttonLoadMore.visibility = if (hasMorePages()) View.VISIBLE else View.GONE
+        binding.buttonLoadMore.visibility = if (currentPage < maxPageIndex()) View.VISIBLE else View.GONE
+        binding.buttonLoadPrev.visibility = if (currentPage > 0) View.VISIBLE else View.GONE
     }
 
-    private fun hasMorePages(): Boolean {
-        val maxPage = if (conversionsList.isEmpty()) 0 else (conversionsList.size - 1) / pageSize
-        return currentPage < maxPage
-    }
+    private fun maxPages(): Int =
+        if (conversionsList.isEmpty()) 1 else ((conversionsList.size - 1) / pageSize) + 1
 
-    private fun maxPages(): Int {
-        return if (conversionsList.isEmpty()) 1 else ((conversionsList.size - 1) / pageSize) + 1
-    }
+    private fun maxPageIndex(): Int =
+        if (conversionsList.isEmpty()) 0 else (conversionsList.size - 1) / pageSize
 
     override fun onDestroyView() {
         super.onDestroyView()
