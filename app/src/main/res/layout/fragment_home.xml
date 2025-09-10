@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="@android:color/white">
+    android:background="@drawable/background_home">
 
     <TextView
         android:id="@+id/text_select_currency"
@@ -67,7 +67,7 @@
             android:backgroundTint="#009688"
             android:textColor="@android:color/white"
             android:textAllCaps="false"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="6dp"/>
 
         <Button
             android:id="@+id/button_favorites"
@@ -76,7 +76,19 @@
             android:text="Избранные"
             android:backgroundTint="#ff9800"
             android:textColor="@android:color/white"
-            android:textAllCaps="false"/>
+            android:textAllCaps="false"
+            android:layout_marginEnd="6dp"/>
+
+        <Button
+            android:id="@+id/button_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Сбросить"
+            android:backgroundTint="#FF5722"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false" />
+
+
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -134,8 +146,8 @@
         android:id="@+id/text_home"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="#555"
+        android:textSize="18sp"
+        android:textColor="#000000"
         android:gravity="center"
         android:layout_marginBottom="16dp"
         android:paddingHorizontal="12dp"

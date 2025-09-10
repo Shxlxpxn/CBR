@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dip.data.api.CbrApi
+import com.example.dip.data.api.Valute
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,6 +21,9 @@ class HomeViewModel @Inject constructor(
     private val _currencyMap = MutableLiveData<Map<String, Double>>()
     val currencyMap: LiveData<Map<String, Double>> = _currencyMap
 
+    private val _valutes = MutableLiveData<List<Valute>>()
+    val valutes: LiveData<List<Valute>> = _valutes
+
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
@@ -30,19 +34,15 @@ class HomeViewModel @Inject constructor(
                 val valCurs = cbrApi.getCurrencyRates()
                 val ratesMap = valCurs.valute.associate { it.charCode to it.valueDouble }
                 _currencyMap.value = ratesMap
+                _valutes.value = valCurs.valute
                 _error.value = null
             } catch (e: Exception) {
                 _currencyMap.value = emptyMap()
+                _valutes.value = emptyList()
                 _error.value = e.message ?: "Неизвестная ошибка"
             } finally {
                 _loading.value = false
             }
         }
     }
-
-
-    fun setCurrencyMap(map: Map<String, Double>) {
-        _currencyMap.value = map
-    }
-
 }

@@ -8,16 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dip.App
 import com.example.dip.R
+import com.example.dip.data.api.Valute
 import com.example.dip.data.rv_adapters.ConversionsAdapter
 import com.example.dip.databinding.FragmentHomeBinding
+import com.example.dip.ui.details.DetailsFragment
 import javax.inject.Inject
 
 class HomeFragment : Fragment() {
@@ -42,9 +46,10 @@ class HomeFragment : Fragment() {
 
     private var currentPage = 0
     private val pageSize = 5
-    private var conversionsList: List<Pair<String, Double>> = emptyList()
+    private var conversionsList: List<Valute> = emptyList()
 
     private var ratesMap: Map<String, Double> = emptyMap()
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -75,10 +80,18 @@ class HomeFragment : Fragment() {
         }
 
         // RecyclerView + adapter
-        conversionsAdapter = ConversionsAdapter()
+        conversionsAdapter = ConversionsAdapter { valute ->
+            val bundle = Bundle().apply { putParcelable("valute", valute) }
+            val detailsFragment = DetailsFragment().apply { arguments = bundle }
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment_activity_main, detailsFragment)
+                .addToBackStack(null)
+                .commit()
+        }
         binding.recyclerViewConversions.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = conversionsAdapter
+            itemAnimator = DefaultItemAnimator()
         }
 
         // Наблюдаем за общим ViewModel
@@ -126,8 +139,14 @@ class HomeFragment : Fragment() {
             favoriteCurrencies.addAll(selectedCurrencies)
             Toast.makeText(requireContext(), "Избранные валюты сохранены", Toast.LENGTH_SHORT).show()
         }
+        binding.buttonReset.setOnClickListener {
+            selectedCurrencies.clear()
+            updateConversionsAndShowPage()
+            Toast.makeText(requireContext(), "Выбранные валюты сброшены", Toast.LENGTH_SHORT).show()
+        }
 
-        // Кнопки пагинации
+
+        // Кнопки
         binding.buttonLoadMore.setOnClickListener {
             val maxPage = if (conversionsList.isEmpty()) 0 else (conversionsList.size + 1) / pageSize
             if (currentPage < maxPage) {
@@ -147,35 +166,39 @@ class HomeFragment : Fragment() {
         viewModel.error.observe(viewLifecycleOwner) { error ->
             binding.textHome.text = error?.let { "Ошибка: $it" } ?: ""
         }
-
-        // Показать/скрыть индикатор в пагинации
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressPagination.visibility = if (loading) View.VISIBLE else View.GONE
         }
     }
 
     private fun updateConversionsAndShowPage() {
-        Log.d("HomeFragment", "⚡ Запуск updateConversionsAndShowPage()")
-        Log.d("HomeFragment", "⚡ ratesMap.size=${ratesMap.size}, selectedCurrencies=$selectedCurrencies, base=$selectedBaseCurrency")
+        binding.recyclerViewConversions.animate().alpha(0f).setDuration(200).withEndAction {
 
-        if (ratesMap.isEmpty() || selectedCurrencies.isEmpty()) {
-            Log.d("HomeFragment", "Нет данных для отображения: ratesMap=${ratesMap.size}, selected=${selectedCurrencies.size}")
-            conversionsList = emptyList()
+            if (ratesMap.isEmpty() || selectedCurrencies.isEmpty()) {
+                conversionsList = emptyList()
+                showCurrentPage()
+                return@withEndAction
+            }
+
+            val baseRate = ratesMap[selectedBaseCurrency] ?: 1.0
+            val conversions = selectedCurrencies.mapNotNull { code ->
+                val rate = ratesMap[code]
+                rate?.let {
+                    Valute(
+                        charCode = code,
+                        name = code,
+                        nominal = 1,
+                        value = (it / baseRate).toString(),
+                        previous = ""
+                    )
+                }
+            }
+            conversionsList = conversions
+            currentPage = 0
             showCurrentPage()
-            return
-        }
 
-        val baseRate = ratesMap[selectedBaseCurrency] ?: 1.0
-        val conversions = selectedCurrencies.mapNotNull { code ->
-            val rate = ratesMap[code]
-            rate?.let { code to it / baseRate }
-        }
-
-        Log.d("HomeFragment", "✅ Список для адаптера: $conversions")
-
-        conversionsList = conversions
-        currentPage = 0
-        showCurrentPage()
+            binding.recyclerViewConversions.animate().alpha(1f).setDuration(200).start()
+        }.start()
     }
 
     private fun showCurrentPage() {
