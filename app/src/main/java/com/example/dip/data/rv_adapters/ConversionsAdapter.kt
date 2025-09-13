@@ -7,13 +7,15 @@ import com.example.dip.data.api.Valute
 import com.example.dip.databinding.ItemConversionBinding
 import java.text.DecimalFormat
 
-class ConversionsAdapter(private val onConversionClick: (Valute) -> Unit) :
-    RecyclerView.Adapter<ConversionsAdapter.ConversionViewHolder>() {
+class ConversionsAdapter(
+    private val onConversionClick: (Valute) -> Unit
+) : RecyclerView.Adapter<ConversionsAdapter.ConversionViewHolder>() {
 
     private val conversions = mutableListOf<Valute>()
     private val decimalFormat = DecimalFormat("#.####")
 
-    inner class ConversionViewHolder(val binding: ItemConversionBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ConversionViewHolder(val binding: ItemConversionBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     fun setConversions(newConversions: List<Valute>) {
         conversions.clear()
@@ -22,11 +24,7 @@ class ConversionsAdapter(private val onConversionClick: (Valute) -> Unit) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversionViewHolder {
-        val binding = ItemConversionBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
+        val binding = ItemConversionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ConversionViewHolder(binding)
     }
 
@@ -40,5 +38,4 @@ class ConversionsAdapter(private val onConversionClick: (Valute) -> Unit) :
     }
 
     override fun getItemCount(): Int = conversions.size
-
 }

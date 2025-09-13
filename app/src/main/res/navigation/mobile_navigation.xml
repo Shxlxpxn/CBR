@@ -14,19 +14,7 @@
             android:id="@+id/action_navigation_home_to_detailsFragment"
             app:destination="@id/detailsFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.example.dip.ui.history.HistoryFragment"
-        android:label="@string/title_history"
-        tools:layout="@layout/fragment_history" />
-
-    <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.example.dip.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
-
+    
     <fragment
         android:id="@+id/detailsFragment"
         android:name="com.example.dip.ui.details.DetailsFragment"
