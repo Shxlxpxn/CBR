@@ -1,24 +1,26 @@
 package com.example.dip.data.rv_adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.dip.data.api.Valute
 import com.example.dip.databinding.ItemConversionBinding
 import java.text.DecimalFormat
 
-class ConversionsAdapter : RecyclerView.Adapter<ConversionsAdapter.ConversionViewHolder>() {
+class ConversionsAdapter(
+    private val onConversionClick: (Valute) -> Unit
+) : RecyclerView.Adapter<ConversionsAdapter.ConversionViewHolder>() {
 
-    private val conversions = mutableListOf<Pair<String, Double>>()
+    private val conversions = mutableListOf<Valute>()
     private val decimalFormat = DecimalFormat("#.####")
 
-    inner class ConversionViewHolder(val binding: ItemConversionBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ConversionViewHolder(val binding: ItemConversionBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
-    fun setConversions(newConversions: List<Pair<String, Double>>) {
+    fun setConversions(newConversions: List<Valute>) {
         conversions.clear()
         conversions.addAll(newConversions)
         notifyDataSetChanged()
-        Log.d("Conversions", "Обновляем данные: $conversions")
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversionViewHolder {
@@ -27,12 +29,13 @@ class ConversionsAdapter : RecyclerView.Adapter<ConversionsAdapter.ConversionVie
     }
 
     override fun onBindViewHolder(holder: ConversionViewHolder, position: Int) {
-        val (currency, rate) = conversions[position]
-        holder.binding.textCurrency.text = currency
-        holder.binding.textRate.text = decimalFormat.format(rate)
-        Log.d("ConversionsAdapter", "Отображаем валюту: ${conversions[position].first}, курс: ${conversions[position].second}")
+        val valute = conversions[position]
+        holder.binding.textCurrency.text = valute.charCode
+        holder.binding.textRate.text = decimalFormat.format(valute.valueDouble)
+        holder.binding.root.setOnClickListener {
+            onConversionClick(valute)
+        }
     }
 
     override fun getItemCount(): Int = conversions.size
-
 }
