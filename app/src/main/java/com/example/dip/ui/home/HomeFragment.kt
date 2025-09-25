@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dip.App
@@ -34,18 +35,14 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val availableCurrencies = listOf(
-        "RUB", "USD", "EUR", "CNY", "KZT", "GBP", "JPY", "CHF", "AUD", "CAD"
-    )
-
-    private var selectedBaseCurrency = "RUB"
+    private var selectedBaseCurrency: String = "RUB"
     private val selectedCurrencies = mutableSetOf<String>()
     private val favoriteCurrencies = mutableSetOf<String>()
 
     private lateinit var conversionsAdapter: ConversionsAdapter
 
     private var currentPage = 0
-    private val pageSize = 5
+    private var pageSize: Int = 5
     private var conversionsList: List<Valute> = emptyList()
 
     private var ratesMap: Map<String, Double> = emptyMap()
@@ -54,6 +51,13 @@ class HomeFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as App).appComponent.inject(this)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        selectedBaseCurrency = prefs.getString("base_currency", "RUB") ?: "RUB"
+        pageSize = prefs.getString("page_size", "5")?.toIntOrNull() ?: 5
     }
 
     override fun onCreateView(
@@ -66,18 +70,6 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Spinner выбора базовой валюты
-        val baseAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item, availableCurrencies)
-        binding.spinnerFromCurrency.adapter = baseAdapter
-        binding.spinnerFromCurrency.setSelection(availableCurrencies.indexOf(selectedBaseCurrency))
-        binding.spinnerFromCurrency.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                selectedBaseCurrency = availableCurrencies[position]
-                updateConversionsAndShowPage()
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
 
         // RecyclerView
         conversionsAdapter = ConversionsAdapter { valute ->
@@ -97,37 +89,12 @@ class HomeFragment : Fragment() {
         }
         viewModel.valutes.observe(viewLifecycleOwner) { valutes ->
             valutesList = valutes
+            val allCodes = listOf("RUB") + valutes.map { it.charCode }
+            setupCurrencySpinner(allCodes)
         }
 
-        // Кнопка выбора валют (мультивыбор)
-        binding.buttonSelectCurrencies.setOnClickListener {
-            val currenciesArray = availableCurrencies.toTypedArray()
-            val tempSelected = selectedCurrencies.toMutableSet()
-            val checkedItems = availableCurrencies.map { tempSelected.contains(it) }.toBooleanArray()
-
-            AlertDialog.Builder(requireContext())
-                .setTitle("Выберите валюты")
-                .setMultiChoiceItems(currenciesArray, checkedItems) { _, which, isChecked ->
-                    if (isChecked) tempSelected.add(currenciesArray[which])
-                    else tempSelected.remove(currenciesArray[which])
-                }
-                .setPositiveButton("Выбрать") { dialog, _ ->
-                    selectedCurrencies.clear()
-                    selectedCurrencies.addAll(tempSelected)
-                    updateConversionsAndShowPage()
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Отмена", null)
-                .show()
-        }
-
-        // Кнопка перехода на графики
         binding.buttonShowChart.setOnClickListener {
-            val selectedPosition = binding.spinnerFromCurrency.selectedItemPosition
-            val selectedCode = if (selectedPosition != AdapterView.INVALID_POSITION) {
-                availableCurrencies[selectedPosition]
-            } else "RUB"
-
+            val selectedCode = selectedBaseCurrency
             val selectedValute: Valute? = if (selectedCode == "RUB") {
                 Valute(
                     charCode = "RUB",
@@ -175,12 +142,12 @@ class HomeFragment : Fragment() {
 
         // Кнопки пагинации
         binding.buttonLoadMore.setOnClickListener {
-            val maxPage = if (conversionsList.isEmpty()) 0 else (conversionsList.size + 1) / pageSize
-            if (currentPage < maxPage) {
+            if (currentPage < maxPageIndex()) {
                 currentPage++
                 showCurrentPage()
             }
         }
+
         binding.buttonLoadPrev.setOnClickListener {
             if (currentPage > 0) {
                 currentPage--
@@ -194,6 +161,41 @@ class HomeFragment : Fragment() {
         }
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressPagination.visibility = if (loading) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun setupCurrencySpinner(codes: List<String>) {
+        val baseAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item, codes)
+        binding.spinnerFromCurrency.adapter = baseAdapter
+        val defaultIndex = codes.indexOf(selectedBaseCurrency).takeIf { it >= 0 } ?: 0
+        binding.spinnerFromCurrency.setSelection(defaultIndex)
+        binding.spinnerFromCurrency.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedBaseCurrency = codes[position]
+                updateConversionsAndShowPage()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        binding.buttonSelectCurrencies.setOnClickListener {
+            val currenciesArray = codes.toTypedArray()
+            val tempSelected = selectedCurrencies.toMutableSet()
+            val checkedItems = codes.map { tempSelected.contains(it) }.toBooleanArray()
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("Выберите валюты")
+                .setMultiChoiceItems(currenciesArray, checkedItems) { _, which, isChecked ->
+                    if (isChecked) tempSelected.add(currenciesArray[which])
+                    else tempSelected.remove(currenciesArray[which])
+                }
+                .setPositiveButton("Выбрать") { dialog, _ ->
+                    selectedCurrencies.clear()
+                    selectedCurrencies.addAll(tempSelected)
+                    updateConversionsAndShowPage()
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Отмена", null)
+                .show()
         }
     }
 
@@ -253,3 +255,4 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 }
+

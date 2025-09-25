@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Валюты -->
+    <string-array name="currency_codes">
+        <item>RUB</item>
+        <item>USD</item>
+        <item>EUR</item>
+        <item>CNY</item>
+        <item>GBP</item>
+        <item>JPY</item>
+        <item>CHF</item>
+        <item>AUD</item>
+        <item>CAD</item>
+        <item>KZT</item>
+        <item>SEK</item>
+        <item>NOK</item>
+        <item>TRY</item>
+        <item>INR</item>
+        <item>BRL</item>
+        <item>ZAR</item>
+        <item>HKD</item>
+        <item>SGD</item>
+        <item>PLN</item>
+        <item>HUF</item>
+    </string-array>
+
+    <string-array name="currency_names">
+        <item>Российский рубль</item>
+        <item>Доллар США</item>
+        <item>Евро</item>
+        <item>Китайский юань</item>
+        <item>Фунт стерлингов</item>
+        <item>Японская иена</item>
+        <item>Швейцарский франк</item>
+        <item>Австралийский доллар</item>
+        <item>Канадский доллар</item>
+        <item>Казахстанский тенге</item>
+        <item>Шведская крона</item>
+        <item>Норвежская крона</item>
+        <item>Турецкая лира</item>
+        <item>Индийская рупия</item>
+        <item>Бразильский реал</item>
+        <item>Южноафриканский рэнд</item>
+        <item>Гонконгский доллар</item>
+        <item>Сингапурский доллар</item>
+        <item>Польский злотый</item>
+        <item>Венгерский форинт</item>
+    </string-array>
+
+    <!-- Размеры страниц -->
+    <string-array name="page_size_entries">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="page_size_values">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+</resources>

@@ -1,0 +1,27 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Выбор базовой валюты -->
+    <ListPreference
+        android:key="base_currency"
+        android:title="Базовая валюта"
+        android:entries="@array/currency_names"
+        android:entryValues="@array/currency_codes"
+        android:defaultValue="RUB"
+        android:summary="%s" />
+
+    <!-- Количество валют на странице -->
+    <ListPreference
+        android:key="page_size"
+        android:title="Количество валют на странице"
+        android:entries="@array/page_size_entries"
+        android:entryValues="@array/page_size_values"
+        android:defaultValue="5"
+        android:summary="%s" />
+
+    <!-- Тёмная тема -->
+    <SwitchPreferenceCompat
+        android:key="dark_theme"
+        android:title="Тёмная тема"
+        android:defaultValue="false" />
+
+</PreferenceScreen>
