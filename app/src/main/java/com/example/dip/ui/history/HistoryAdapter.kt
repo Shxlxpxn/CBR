@@ -22,7 +22,6 @@ class HistoryAdapter(
 
     inner class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val text: TextView = itemView.findViewById(R.id.text_currency)
-        private val card: CardView? = itemView.findViewById(R.id.card_root)
 
         init {
             itemView.setOnClickListener {

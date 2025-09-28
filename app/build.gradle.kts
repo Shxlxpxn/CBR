@@ -40,7 +40,6 @@ android {
     }
 
     buildFeatures {
-        buildConfig = true
         viewBinding = true
         dataBinding = true
     }
@@ -48,26 +47,26 @@ android {
 
 dependencies {
     // AndroidX
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
 
     // Lifecycle
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.3")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 
     // Navigation
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.0")
-
-    // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.retrofit2:converter-simplexml:2.11.0")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
     // Dagger
     implementation("com.google.dagger:dagger:2.57")
@@ -78,19 +77,22 @@ dependencies {
     kapt("androidx.room:room-compiler:2.7.2")
     implementation("androidx.room:room-ktx:2.7.2")
 
-    // Tests
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
 
+    // Preferences
+    implementation(libs.androidx.preference)
+    implementation(libs.androidx.preference.ktx)
+
+    // UI
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.cardview:cardview:1.0.0")
 
-    val navVersion = "2.7.7"
-    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
-    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
-
+    // MPAndroidChart
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
-    implementation("androidx.preference:preference-ktx:1.2.1")
+    // Tests
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

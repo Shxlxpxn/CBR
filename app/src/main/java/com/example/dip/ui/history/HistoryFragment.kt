@@ -16,18 +16,14 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Инициализация представлений
         recyclerView = view.findViewById(R.id.recyclerViewHistory)
         clearButton = view.findViewById(R.id.button_clear_history)
 
-        // Установка LayoutManager для RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         historyManager = HistoryManager(requireContext())
 
         adapter = HistoryAdapter { currency ->
-            // обработка клика
         }
 
         recyclerView.adapter = adapter
@@ -35,9 +31,6 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
         adapter.submitList(historyManager.getHistory())
 
         clearButton.setOnClickListener {
-            // Если у вас есть этот метод, то все ок.
-            // Если нет, удалите или замените на стандартный setOnClickListener
-            // it.animateClick()
             historyManager.clearHistory()
             adapter.submitList(historyManager.getHistory())
         }
