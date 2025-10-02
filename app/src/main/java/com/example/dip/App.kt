@@ -17,7 +17,6 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Читаем настройки темы при запуске
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val darkThemeEnabled = prefs.getBoolean("dark_theme", false)
 

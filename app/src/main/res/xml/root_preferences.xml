@@ -22,6 +22,7 @@
     <SwitchPreferenceCompat
         android:key="dark_theme"
         android:title="Тёмная тема"
+        android:summary="Переключение светлой и тёмной темы"
         android:defaultValue="false" />
 
 </PreferenceScreen>

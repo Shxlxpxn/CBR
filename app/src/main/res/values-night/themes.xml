@@ -1,16 +1,29 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <style name="Theme.DIP" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/purple_500</item>
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="android:windowBackground">@drawable/background_dark</item>
+        <item name="colorPrimary">@color/gray_dark</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#1DB954</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
 
-        <!-- Bottom navigation -->
-        <item name="itemIconTint">@color/bottom_nav_text_color</item>
-        <item name="itemTextColor">@color/bottom_nav_text_color</item>
+        <item name="android:colorBackground">#121212</item>
+        <item name="colorOnBackground">#E6E1E5</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:textColorPrimary">?attr/colorOnBackground</item>
+        <item name="android:textColorSecondary">#B3B3B3</item>
+
+        <item name="alertDialogTheme">@style/ThemeOverlay.DIP.AlertDialog</item>
+        <item name="toolbarStyle">@style/Widget.DIP.Toolbar</item>
+    </style>
+
+    <style name="ThemeOverlay.DIP.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTheme">?attr/colorOnBackground</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+    </style>
+
+    <style name="Widget.DIP.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
     </style>
 </resources>
+
