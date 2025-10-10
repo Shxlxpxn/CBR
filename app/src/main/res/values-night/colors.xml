@@ -1,19 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="color_primary">#D0BCFF</color>
-    <color name="color_on_primary">@color/color_secondary</color>
-    <color name="color_secondary">#66FFF9</color>
-    <color name="color_on_secondary">#00332C</color>
+    <!-- базовые -->
     <color name="color_background">#121212</color>
-    <color name="color_on_background">#FFFFFF</color>
     <color name="color_surface">#1E1E1E</color>
-    <color name="color_on_surface">#FFFFFF</color>
-    <color name="color_error">#CF6679</color>
-    <color name="color_on_error">#000000</color>
-    <color name="orange">#FFB74D</color>
-    <color name="red">#EF5350</color>
-    <color name="teal_700">#03DAC5</color>
-    <color name="spinner_item_bg">#212121</color>
-    <color name="spinner_dropdown_bg">#333333</color>
-    <color name="spinner_item_text">#FFFFFF</color>
+    <color name="color_on_background">#E6E1E5</color>
+    <color name="color_on_surface">#E6E1E5</color>
+    <color name="color_secondary_text">#A0A0A0</color>
+
+    <!-- акценты (светлые варианты акцентов) -->
+    <color name="color_accent">#80CBC4</color>
+    <color name="color_accent2">#B39DDB</color>
+
+    <color name="icon_inactive">#757575</color>
+    <color name="icon_active">#B39DDB</color>
+
+    <!-- спиннер -->
+    <color name="spinner_item_bg">#1E1E1E</color>
+    <color name="spinner_dropdown_bg">#2A2A2A</color>
+    <color name="spinner_text">#E6E1E5</color>
+
 </resources>

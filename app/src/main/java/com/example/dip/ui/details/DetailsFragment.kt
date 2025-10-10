@@ -1,5 +1,6 @@
 package com.example.dip.ui.details
 
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.text.SpannableStringBuilder
@@ -11,8 +12,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import com.example.dip.R
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.dip.data.api.Valute
@@ -43,21 +44,28 @@ class DetailsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    private fun getColorByName(name: String, fallbackResId: Int): Int {
+        val ctx = requireContext()
+        val id = resources.getIdentifier(name, "color", ctx.packageName)
+        return if (id != 0) ContextCompat.getColor(ctx, id) else ContextCompat.getColor(ctx, fallbackResId)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (requireActivity() as? AppCompatActivity)?.supportActionBar?.apply {
+        (requireActivity() as? androidx.appcompat.app.AppCompatActivity)?.supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             title = "Детали валюты"
         }
         setHasOptionsMenu(true)
 
+        // читаем аргумент безопасно
         valuteArg = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable("valute", Valute::class.java)
         } else {
@@ -90,8 +98,7 @@ class DetailsFragment : Fragment() {
 
             val currentVal = todayInfo?.value ?: history.lastOrNull()
             val previousValFromArg = safeParseDouble(provided.previous)
-            val previousVal =
-                previousValFromArg ?: if (history.size >= 2) history[history.size - 2] else null
+            val previousVal = previousValFromArg ?: if (history.size >= 2) history[history.size - 2] else null
 
             if (!todayInfo?.name.isNullOrBlank()) {
                 binding.collapsingToolbar.title = todayInfo?.name
@@ -107,9 +114,10 @@ class DetailsFragment : Fragment() {
         nominal: Int,
         current: Double?,
         previous: Double?,
-        history: List<Double>
+        history: List<Double>,
     ) {
         withContext(Dispatchers.Main) {
+            // составляем текст
             val detailsText = SpannableStringBuilder()
                 .append(createBold("Номинал: ")).append("$nominal\n\n")
                 .append(createBold("Текущее значение: "))
@@ -118,7 +126,6 @@ class DetailsFragment : Fragment() {
                 .append(createBold("Предыдущее значение: "))
                 .append(previous?.let { decimalFormat.format(it) } ?: "—")
                 .append("\n\n")
-
             binding.detailText.text = detailsText
 
             if (history.isNotEmpty()) showChart(history)
@@ -126,8 +133,7 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    private fun safeParseDouble(s: String?): Double? =
-        s?.replace(",", ".")?.toDoubleOrNull()
+    private fun safeParseDouble(s: String?): Double? = s?.replace(",", ".")?.toDoubleOrNull()
 
     private suspend fun fetchHistoryRates(code: String, days: Int): List<Double> {
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.US)
@@ -152,33 +158,32 @@ class DetailsFragment : Fragment() {
 
     private fun parseRateFromXml(xml: String, code: String): Double? {
         try {
-            val parser = XmlPullParserFactory.newInstance().newPullParser()
+            val factory = XmlPullParserFactory.newInstance()
+            val parser = factory.newPullParser()
             parser.setInput(xml.reader())
 
             var eventType = parser.eventType
             var inValute = false
-            var charCode = ""
-            var value = ""
+            var currentCharCode = ""
+            var currentValue = ""
 
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 when (eventType) {
                     XmlPullParser.START_TAG -> {
-                        when (parser.name) {
-                            "Valute" -> inValute = true
-                            "CharCode" -> if (inValute) {
-                                parser.next(); charCode = parser.text ?: ""
-                            }
-                            "Value" -> if (inValute) {
-                                parser.next(); value = parser.text ?: ""
-                            }
+                        if (parser.name == "Valute") inValute = true
+                        if (inValute && parser.name == "CharCode") {
+                            parser.next(); currentCharCode = parser.text ?: ""
+                        }
+                        if (inValute && parser.name == "Value") {
+                            parser.next(); currentValue = parser.text ?: ""
                         }
                     }
                     XmlPullParser.END_TAG -> {
                         if (parser.name == "Valute") {
-                            if (charCode == code) {
-                                return value.replace(",", ".").toDoubleOrNull()
+                            if (currentCharCode == code) {
+                                return currentValue.replace(",", ".").toDoubleOrNull()
                             }
-                            inValute = false; charCode = ""; value = ""
+                            inValute = false; currentCharCode = ""; currentValue = ""
                         }
                     }
                 }
@@ -190,51 +195,52 @@ class DetailsFragment : Fragment() {
         return null
     }
 
-    private suspend fun fetchValuteInfoForDate(code: String): ValuteInfo? =
-        withContext(Dispatchers.IO) {
-            try {
-                val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.US)
-                val today = formatter.format(Calendar.getInstance().time)
-                val url = "https://www.cbr.ru/scripts/XML_daily.asp?date_req=$today"
-                val xml = URL(url).readText(Charset.forName("windows-1251"))
-                parseValuteInfoFromXml(xml, code)
-            } catch (e: Exception) {
-                Log.e("DetailsFragment", "Ошибка fetchValuteInfoForDate", e)
-                null
-            }
+    private suspend fun fetchValuteInfoForDate(code: String) = withContext(Dispatchers.IO) {
+        try {
+            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+            val today = formatter.format(Calendar.getInstance().time)
+            val url = "https://www.cbr.ru/scripts/XML_daily.asp?date_req=$today"
+            val xml = URL(url).readText(Charset.forName("windows-1251"))
+            parseValuteInfoFromXml(xml, code)
+        } catch (e: Exception) {
+            Log.e("DetailsFragment", "Ошибка fetchValuteInfoForDate", e)
+            null
         }
+    }
 
     private fun parseValuteInfoFromXml(xml: String, code: String): ValuteInfo? {
         try {
-            val parser = XmlPullParserFactory.newInstance().newPullParser()
+            val factory = XmlPullParserFactory.newInstance()
+            val parser = factory.newPullParser()
             parser.setInput(xml.reader())
 
             var eventType = parser.eventType
             var inValute = false
-            var charCode = ""
-            var value = ""
-            var nominal = ""
-            var name = ""
+            var currentCharCode = ""
+            var currentValue = ""
+            var currentNominal = ""
+            var currentName = ""
 
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 when (eventType) {
-                    XmlPullParser.START_TAG -> when (parser.name) {
-                        "Valute" -> inValute = true
-                        "CharCode" -> if (inValute) { parser.next(); charCode = parser.text ?: "" }
-                        "Value" -> if (inValute) { parser.next(); value = parser.text ?: "" }
-                        "Nominal" -> if (inValute) { parser.next(); nominal = parser.text ?: "" }
-                        "Name" -> if (inValute) { parser.next(); name = parser.text ?: "" }
+                    XmlPullParser.START_TAG -> {
+                        when (parser.name) {
+                            "Valute" -> inValute = true
+                            "CharCode" -> if (inValute) { parser.next(); currentCharCode = parser.text ?: "" }
+                            "Value" -> if (inValute) { parser.next(); currentValue = parser.text ?: "" }
+                            "Nominal" -> if (inValute) { parser.next(); currentNominal = parser.text ?: "" }
+                            "Name" -> if (inValute) { parser.next(); currentName = parser.text ?: "" }
+                        }
                     }
                     XmlPullParser.END_TAG -> {
                         if (parser.name == "Valute") {
-                            if (charCode == code) {
-                                return ValuteInfo(
-                                    name = name,
-                                    nominal = nominal.toIntOrNull(),
-                                    value = value.replace(",", ".").toDoubleOrNull()
-                                )
+                            if (currentCharCode == code) {
+                                val valueD = currentValue.replace(",", ".").toDoubleOrNull()
+                                val nominalInt = currentNominal.toIntOrNull()
+                                return ValuteInfo(name = currentName, nominal = nominalInt, value = valueD)
                             }
-                            inValute = false; charCode = ""; value = ""; nominal = ""; name = ""
+                            inValute = false
+                            currentCharCode = ""; currentValue = ""; currentNominal = ""; currentName = ""
                         }
                     }
                 }
@@ -250,9 +256,20 @@ class DetailsFragment : Fragment() {
 
     private fun showChart(history: List<Double>) {
         val entries = history.mapIndexed { i, v -> Entry(i.toFloat(), v.toFloat()) }
-        val lineColor = ContextCompat.getColor(requireContext(), R.color.color_secondary)
-        val textColor = ContextCompat.getColor(requireContext(), R.color.color_on_background)
 
+        val accent = getColorByName("color_secondary", R.color.color_on_background)
+        val primary = getColorByName("color_primary", R.color.color_on_background)
+        val onSurface = getColorByName("color_on_surface", android.R.color.white)
+        val surface = getColorByName("color_surface", android.R.color.background_light)
+
+        val isNight = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
+        val lineColor = if (isNight) accent else primary
+
+        val gridAlpha = (if (isNight) 0.14f else 0.08f)
+        val gridColor = ColorUtils.setAlphaComponent(onSurface, (255 * gridAlpha).toInt())
+
+        val textColor = onSurface
         val dataSet = LineDataSet(entries, "Курс за ${history.size} дней").apply {
             setDrawValues(false)
             setDrawCircles(true)
@@ -261,44 +278,46 @@ class DetailsFragment : Fragment() {
             circleRadius = 4f
             setCircleColor(lineColor)
             valueTextColor = textColor
+            mode = LineDataSet.Mode.LINEAR
         }
 
         binding.detailChart.apply {
+            setBackgroundColor(surface)
             data = LineData(dataSet)
             description.isEnabled = false
             axisRight.isEnabled = false
 
             xAxis.position = XAxis.XAxisPosition.BOTTOM
-            xAxis.setDrawGridLines(false)
+            xAxis.setDrawGridLines(true)
+            xAxis.gridColor = gridColor
             xAxis.textColor = textColor
 
-            axisLeft.setDrawGridLines(false)
+            axisLeft.setDrawGridLines(true)
+            axisLeft.gridColor = gridColor
             axisLeft.textColor = textColor
 
             legend.textColor = textColor
 
-            animateX(1200)
+            animateX(900)
             alpha = 0f
             visibility = View.VISIBLE
-            animate().alpha(1f).setDuration(600).start()
+            animate().alpha(1f).setDuration(400).start()
             invalidate()
         }
     }
 
     private fun createBold(text: String): SpannableStringBuilder {
-        return SpannableStringBuilder(text).apply {
-            setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
-        }
+        val spannable = SpannableStringBuilder(text)
+        spannable.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
+        return spannable
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        android.R.id.home -> {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+            true
         }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView() {

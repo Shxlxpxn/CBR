@@ -19,7 +19,7 @@
             <ImageView
                 android:id="@+id/detail_image"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 app:layout_collapseMode="parallax" />
 
@@ -48,14 +48,16 @@
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                android:textColor="?attr/colorOnSurface"/>
 
             <TextView
                 android:id="@+id/detail_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:lineSpacingExtra="4dp" />
+                android:lineSpacingExtra="4dp"
+                android:textColor="?attr/colorOnSurface"/>
 
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/detail_chart"

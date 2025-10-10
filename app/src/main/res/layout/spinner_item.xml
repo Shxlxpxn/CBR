@@ -4,6 +4,6 @@
     android:layout_height="wrap_content"
     android:padding="12dp"
     android:gravity="center_vertical"
-    android:background="@color/spinner_item_bg"
-    android:textColor="@color/spinner_item_text"
+    android:background="?attr/colorSurface"
+    android:textColor="?attr/colorOnBackground"
     android:textSize="16sp" />

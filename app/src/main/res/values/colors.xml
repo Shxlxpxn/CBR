@@ -1,28 +1,21 @@
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="black">#000000</color>
-    <color name="background_dark">#121212</color>
-    <color name="green">#009688</color>
-    <color name="gray">#909090</color>
-    <color name="gray_dark">#4D4D4D</color>
-    <color name="color_primary">#6750A4</color>
-    <color name="color_on_primary">#FFFFFF</color>
-    <color name="color_secondary">#03DAC6</color>
-    <color name="color_on_secondary">#000000</color>
+    <!-- базовые -->
     <color name="color_background">#FFFFFF</color>
-    <color name="color_on_background">#000000</color>
     <color name="color_surface">#F5F5F5</color>
-    <color name="color_on_surface">#000000</color>
-    <color name="color_error">#B00020</color>
-    <color name="color_on_error">#FFFFFF</color>
-    <color name="orange">#FF9800</color>
-    <color name="red">#F44336</color>
-    <color name="teal_700">#018786</color>
+    <color name="color_on_background">#1C1B1F</color>
+    <color name="color_on_surface">#1C1B1F</color>
+    <color name="color_secondary_text">#6B6B6B</color>
+
+    <!-- акценты -->
+    <color name="color_accent">#009688</color>
+    <color name="color_accent2">#6C63FF</color>
+
+    <color name="icon_inactive">#9E9E9E</color>
+    <color name="icon_active">#6C63FF</color>
+
+    <!-- спиннер -->
     <color name="spinner_item_bg">#FFFFFF</color>
-    <color name="spinner_dropdown_bg">#F0F0F0</color>
-    <color name="spinner_item_text">#000000</color>
+    <color name="spinner_dropdown_bg">#F5F5F5</color>
+    <color name="spinner_text">#1C1B1F</color>
 </resources>
+

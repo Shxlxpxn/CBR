@@ -52,7 +52,7 @@ class ConversionsAdapter(
         holder.binding.textCurrency.text = valute.charCode
         holder.binding.textRate.text = rateText
         val textColor = resolveAttrColor(ctx, android.R.attr.textColorPrimary, R.color.color_on_background)
-        val subTextColor = resolveAttrColor(ctx, android.R.attr.textColorSecondary, R.color.gray)
+        val subTextColor = resolveAttrColor(ctx, android.R.attr.textColorSecondary, R.color.color_surface)
         holder.binding.textCurrency.setTextColor(textColor)
         holder.binding.textRate.setTextColor(subTextColor)
 

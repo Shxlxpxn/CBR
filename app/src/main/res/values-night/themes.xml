@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.DIP" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/gray_dark</item>
+        <item name="colorPrimary">#4A47A3</item>
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorSecondary">#1DB954</item>
         <item name="colorOnSecondary">#FFFFFF</item>
 
-        <item name="android:colorBackground">#121212</item>
-        <item name="colorOnBackground">#E6E1E5</item>
-        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:colorBackground">#1C1B1F</item>
+        <item name="colorOnBackground">#EAEAEA</item>
+
+        <item name="android:navigationBarColor">#1C1B1F</item>
         <item name="android:textColorPrimary">?attr/colorOnBackground</item>
         <item name="android:textColorSecondary">#B3B3B3</item>
 
@@ -17,13 +18,16 @@
     </style>
 
     <style name="ThemeOverlay.DIP.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="materialAlertDialogTheme">?attr/colorOnBackground</item>
-        <item name="android:textColor">?attr/colorOnBackground</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/DialogButton.Positive</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DialogButton.Negative</item>
     </style>
 
-    <style name="Widget.DIP.Toolbar" parent="Widget.MaterialComponents.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="titleTextColor">?attr/colorOnPrimary</item>
+    <style name="DialogButton.Positive" parent="@android:style/Widget.Material.Button.Borderless.Colored">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="DialogButton.Negative" parent="@android:style/Widget.Material.Button.Borderless.Colored">
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 </resources>
-

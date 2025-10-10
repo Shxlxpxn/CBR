@@ -24,7 +24,7 @@
             android:layout_weight="1"
             android:text="USD"
             android:textSize="18sp"
-            android:textColor="@android:color/black"/>
+            android:textColor="?attr/colorOnSurface"/> />
 
         <Button
             android:id="@+id/button_delete"
@@ -32,9 +32,8 @@
             android:layout_height="wrap_content"
             android:text="Удалить"
             android:textSize="14sp"
-            android:backgroundTint="@android:color/darker_gray"
-            android:textColor="@android:color/white"
+            android:backgroundTint="?attr/colorSecondary"
+            android:textColor="?attr/colorOnSurface"
             android:textAllCaps="false"/>
-
     </LinearLayout>
 </androidx.cardview.widget.CardView>

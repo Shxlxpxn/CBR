@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.DIP" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#6C63FF</item>
+        <item name="colorPrimary">#A09CED</item>
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorSecondary">#00B894</item>
         <item name="colorOnSecondary">#FFFFFF</item>
 
         <item name="android:colorBackground">#FFFFFF</item>
         <item name="colorOnBackground">#1C1B1F</item>
-        <item name="android:navigationBarColor">#6C63FF</item>
+        <item name="android:navigationBarColor">@color/color_background</item>
         <item name="android:textColorPrimary">?attr/colorOnBackground</item>
         <item name="android:textColorSecondary">#6b6b6b</item>
 
