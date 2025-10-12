@@ -24,6 +24,7 @@ import com.example.dip.data.api.Valute
 import com.example.dip.data.rv_adapters.ConversionsAdapter
 import com.example.dip.databinding.FragmentHomeBinding
 import com.example.dip.ui.details.DetailsFragment
+import com.example.dip.ui.history.HistoryManager
 import javax.inject.Inject
 
 class HomeFragment : Fragment() {
@@ -40,6 +41,7 @@ class HomeFragment : Fragment() {
     private val favoriteCurrencies = mutableSetOf<String>()
 
     private lateinit var conversionsAdapter: ConversionsAdapter
+    private lateinit var historyManager: HistoryManager
 
     private var currentPage = 0
     private var pageSize: Int = 5
@@ -51,6 +53,7 @@ class HomeFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as App).appComponent.inject(this)
+        historyManager = HistoryManager(context)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,11 +74,17 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // RecyclerView
         conversionsAdapter = ConversionsAdapter { valute ->
-            val bundle = Bundle().apply { putParcelable("valute", valute) }
+            // При навигации передаём также базовую валюту, чтобы DetailsFragment мог построить относительный график
+            val bundle = Bundle().apply {
+                putParcelable("valute", valute)
+                putString("baseCurrency", selectedBaseCurrency)
+                // если нужен список всех валют в DetailsFragment - можно передать, но не обязательно
+                // putParcelableArrayList("valutesList", ArrayList(valutesList))
+            }
             findNavController().navigate(R.id.action_navigation_home_to_detailsFragment, bundle)
         }
+
         binding.recyclerViewConversions.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = conversionsAdapter
@@ -89,33 +98,52 @@ class HomeFragment : Fragment() {
         }
         viewModel.valutes.observe(viewLifecycleOwner) { valutes ->
             valutesList = valutes
-            val allCodes = listOf("RUB") + valutes.map { it.charCode }
+            // Добавляем RUB в начало списка отображаемых кодов; сортируем остальные по алфавиту
+            val codes = valutes.map { it.charCode }.distinct().sorted()
+            val allCodes = listOf("RUB") + codes
             setupCurrencySpinner(allCodes)
         }
 
         binding.buttonShowChart.setOnClickListener {
-            val selectedCode = selectedBaseCurrency
-            val selectedValute: Valute? = if (selectedCode == "RUB") {
-                Valute(
-                    charCode = "RUB",
-                    name = "Российский рубль",
-                    nominal = 1,
-                    value = "1.0",
-                    previous = "1.0"
-                )
-            } else {
-                valutesList.find { it.charCode == selectedCode }
+            // Берём первую выбранную валюту для показа графика (как раньше)
+            if (selectedCurrencies.isEmpty()) {
+                Toast.makeText(requireContext(), "Выберите валюту для просмотра графика", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-            if (selectedValute != null) {
-                val bundle = Bundle().apply { putParcelable("valute", selectedValute) }
-                findNavController().navigate(R.id.action_navigation_home_to_detailsFragment, bundle)
+            val targetCode = selectedCurrencies.first()
+
+            // Найдём объект Valute для выбранной (или подставим заглушку для RUB)
+            val targetValute: Valute? = if (targetCode == "RUB") {
+                Valute(charCode = "RUB", name = "Российский рубль", nominal = 1, value = "1.0", previous = "1.0")
             } else {
-                Toast.makeText(requireContext(), "Нет данных для $selectedCode", Toast.LENGTH_SHORT).show()
+                valutesList.find { it.charCode == targetCode }
             }
+
+            // Для base используем selectedBaseCurrency (и также создаём заглушку для RUB)
+            val baseValute: Valute? = if (selectedBaseCurrency == "RUB") {
+                Valute(charCode = "RUB", name = "Российский рубль", nominal = 1, value = "1.0", previous = "1.0")
+            } else {
+                valutesList.find { it.charCode == selectedBaseCurrency }
+            }
+
+            if (targetValute == null || baseValute == null) {
+                Toast.makeText(requireContext(), "Нет данных для выбранной валюты", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Сохраняем в историю связь Base -> Target
+            historyManager.addToHistory("${baseValute.charCode} → ${targetValute.charCode}")
+
+            // Навигация: передаём valute и baseCurrency
+            val bundle = Bundle().apply {
+                putParcelable("valute", targetValute)
+                putString("baseCurrency", selectedBaseCurrency)
+            }
+            findNavController().navigate(R.id.action_navigation_home_to_detailsFragment, bundle)
         }
 
-        // Кнопка "Избранные"
+        // Кнопки избранного/сброс
         binding.buttonFavorites.setOnClickListener {
             if (favoriteCurrencies.isNotEmpty()) {
                 selectedCurrencies.clear()
@@ -126,28 +154,25 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Кнопка "Добавить в избранное"
         binding.buttonAddToFavorites.setOnClickListener {
             favoriteCurrencies.clear()
             favoriteCurrencies.addAll(selectedCurrencies)
             Toast.makeText(requireContext(), "Избранные валюты сохранены", Toast.LENGTH_SHORT).show()
         }
 
-        // Кнопка "Сброс"
         binding.buttonReset.setOnClickListener {
             selectedCurrencies.clear()
             updateConversionsAndShowPage()
             Toast.makeText(requireContext(), "Выбранные валюты сброшены", Toast.LENGTH_SHORT).show()
         }
 
-        // Кнопки пагинации
+        // Пагинация
         binding.buttonLoadMore.setOnClickListener {
             if (currentPage < maxPageIndex()) {
                 currentPage++
                 showCurrentPage()
             }
         }
-
         binding.buttonLoadPrev.setOnClickListener {
             if (currentPage > 0) {
                 currentPage--
@@ -167,8 +192,10 @@ class HomeFragment : Fragment() {
     private fun setupCurrencySpinner(codes: List<String>) {
         val baseAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item, codes)
         binding.spinnerFromCurrency.adapter = baseAdapter
+
         val defaultIndex = codes.indexOf(selectedBaseCurrency).takeIf { it >= 0 } ?: 0
         binding.spinnerFromCurrency.setSelection(defaultIndex)
+
         binding.spinnerFromCurrency.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 selectedBaseCurrency = codes[position]
@@ -207,9 +234,10 @@ class HomeFragment : Fragment() {
                 return@withEndAction
             }
 
-            val baseRate = ratesMap[selectedBaseCurrency] ?: 1.0
+            val baseRate = if (selectedBaseCurrency == "RUB") 1.0 else (ratesMap[selectedBaseCurrency] ?: 1.0)
+
             val conversions = selectedCurrencies.mapNotNull { code ->
-                val rate = ratesMap[code]
+                val rate = if (code == "RUB") 1.0 else ratesMap[code]
                 val valute = valutesList.find { it.charCode == code }
                 rate?.let {
                     Valute(
@@ -220,7 +248,8 @@ class HomeFragment : Fragment() {
                         previous = valute?.previous ?: ""
                     )
                 }
-            }
+            }.sortedBy { it.charCode } // сортируем по алфавиту по коду
+
             conversionsList = conversions
             currentPage = 0
             showCurrentPage()
@@ -255,4 +284,3 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 }
-

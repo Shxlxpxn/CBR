@@ -27,6 +27,13 @@ class HomeViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
+    private val _selectedCurrencyCodes = MutableLiveData<List<String>>(emptyList())
+    val selectedCurrencyCodes: LiveData<List<String>> = _selectedCurrencyCodes
+
+    fun setSelectedCurrencies(codes: Collection<String>) {
+        _selectedCurrencyCodes.value = codes.toList()
+    }
+
     fun getCurrencyRates() {
         viewModelScope.launch {
             _loading.value = true

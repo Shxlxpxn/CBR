@@ -1,38 +1,91 @@
 package com.example.dip.ui.history
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dip.R
+import com.example.dip.data.api.Valute
+import com.example.dip.databinding.FragmentHistoryBinding
 
-class HistoryFragment : Fragment(R.layout.fragment_history) {
+
+class HistoryFragment : Fragment() {
+
+    private var _binding: FragmentHistoryBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var historyManager: HistoryManager
-    private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: HistoryAdapter
-    private lateinit var clearButton: Button
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentHistoryBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView = view.findViewById(R.id.recyclerViewHistory)
-        clearButton = view.findViewById(R.id.button_clear_history)
-
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
         historyManager = HistoryManager(requireContext())
 
-        adapter = HistoryAdapter { currency ->
-        }
+        adapter = HistoryAdapter(historyManager,
+            onClick = { historyItem ->
+                val parts = historyItem.split("→").map { it.trim() }
+                if (parts.size == 2) {
+                    val baseCurrency = parts[0]
+                    val targetCurrency = parts[1]
 
-        recyclerView.adapter = adapter
+                    val valute = Valute(
+                        charCode = targetCurrency,
+                        name = targetCurrency,
+                        nominal = 1,
+                        value = "0.0",
+                        previous = "0.0"
+                    )
 
-        adapter.submitList(historyManager.getHistory())
+                    val bundle = Bundle().apply {
+                        putParcelable("valute", valute)
+                        putString("baseCurrency", baseCurrency)
+                    }
 
-        clearButton.setOnClickListener {
+                    findNavController().navigate(
+                        R.id.action_navigation_history_to_detailsFragment,
+                        bundle
+                    )
+                }
+            },
+            onHistoryChanged = { loadHistory() }
+        )
+
+        binding.recyclerViewHistory.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewHistory.adapter = adapter
+
+        loadHistory()
+
+        binding.buttonClearHistory.setOnClickListener {
             historyManager.clearHistory()
-            adapter.submitList(historyManager.getHistory())
+            loadHistory()
+            Toast.makeText(requireContext(), "История очищена", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun loadHistory() {
+        val historyList = historyManager.getHistory().reversed()
+        adapter.submitList(historyList)
+        binding.textHistoryEmpty?.visibility =
+            if (historyList.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }
+
+

@@ -4,4 +4,18 @@
     <string name="title_history">История</string>
     <string name="title_notifications">Уведомления</string>
     <string name="title_settings">Настройки</string>
+    <string name="history_clear_button">Очистить историю</string>
+    <string name="history_empty">История пустая</string>
+    <string name="details_title">Детали валюты</string>
+    <string name="no_data_title">Нет данных</string>
+    <string name="no_data_message">Выберите валюту</string>
+    <string name="no_chart_data">Нет данных для графика</string>
+    <string name="data_load_error">Ошибка загрузки данных</string>
+    <string name="currency_relative_to">%1$s относительно %2$s</string>
+    <string name="base_currency">Базовая валюта</string>
+    <string name="nominal">Номинал</string>
+    <string name="current_value">Текущее значение</string>
+    <string name="previous_value">Предыдущее значение</string>
+    <string name="chart_label">Курс за %1$d дней</string>
+    <string name="back">Назад</string>
 </resources>
