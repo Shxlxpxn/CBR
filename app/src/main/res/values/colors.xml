@@ -1,19 +1,14 @@
 <resources>
-    <!-- базовые -->
     <color name="color_background">#FFFFFF</color>
     <color name="color_surface">#F5F5F5</color>
     <color name="color_on_background">#1C1B1F</color>
     <color name="color_on_surface">#1C1B1F</color>
     <color name="color_secondary_text">#6B6B6B</color>
-
-    <!-- акценты -->
     <color name="color_accent">#009688</color>
     <color name="color_accent2">#6C63FF</color>
-
+    <color name="color_text">#000000</color>
     <color name="icon_inactive">#9E9E9E</color>
     <color name="icon_active">#6C63FF</color>
-
-    <!-- спиннер -->
     <color name="spinner_item_bg">#FFFFFF</color>
     <color name="spinner_dropdown_bg">#F5F5F5</color>
     <color name="spinner_text">#1C1B1F</color>

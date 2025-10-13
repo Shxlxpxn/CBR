@@ -11,13 +11,13 @@ import com.example.dip.R
 
 class HistoryAdapter(
     private val historyManager: HistoryManager,
-    private val onClick: ((String) -> Unit)? = null,
+    private val onClick: ((HistoryItem) -> Unit)? = null,
     private val onHistoryChanged: (() -> Unit)? = null
 ) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
-    private val items = mutableListOf<String>()
+    private val items = mutableListOf<HistoryItem>()
 
-    fun submitList(newList: List<String>) {
+    fun submitList(newList: List<HistoryItem>) {
         items.clear()
         items.addAll(newList)
         notifyDataSetChanged()
@@ -25,43 +25,27 @@ class HistoryAdapter(
 
     inner class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val text: TextView = itemView.findViewById(R.id.text_currency)
-        private val deleteButton: Button = itemView.findViewById(R.id.button_delete)
+        private val buttonDelete: Button = itemView.findViewById(R.id.button_delete)
 
-        init {
-            // При нажатии на элемент — переход к графику
+        fun bind(item: HistoryItem) {
+            text.text = "${item.baseCurrency} → ${item.targetCurrency}"
+
             itemView.setOnClickListener {
-                val pos = bindingAdapterPosition
-                if (pos != RecyclerView.NO_POSITION) {
-                    val item = items[pos]
-                    onClick?.invoke(item)
-                    it.animateClick()
-                }
+                onClick?.invoke(item)
+                it.animateClick()
             }
 
-            deleteButton.setOnClickListener {
-                val pos = bindingAdapterPosition
-                if (pos != RecyclerView.NO_POSITION) {
-                    val item = items[pos]
-                    historyManager.removeFromHistory(item)
-                    items.removeAt(pos)
-                    notifyItemRemoved(pos)
-                    onHistoryChanged?.invoke()
-                    Toast.makeText(
-                        itemView.context,
-                        "Запись \"$item\" удалена",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            buttonDelete.setOnClickListener {
+                historyManager.removeFromHistory(item)
+                onHistoryChanged?.invoke()
+                Toast.makeText(itemView.context, "Запись удалена", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        fun bind(currency: String) {
-            text.text = currency
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_history, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_history, parent, false)
         return HistoryViewHolder(v)
     }
 
@@ -69,5 +53,5 @@ class HistoryAdapter(
         holder.bind(items[position])
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount() = items.size
 }

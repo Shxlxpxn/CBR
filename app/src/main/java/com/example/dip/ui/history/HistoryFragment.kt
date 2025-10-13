@@ -29,50 +29,51 @@ class HistoryFragment : Fragment() {
         return binding.root
     }
 
+    // Настройка RecyclerView, загрузка истории и обработка кнопок.
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         historyManager = HistoryManager(requireContext())
 
-        adapter = HistoryAdapter(historyManager,
-            onClick = { historyItem ->
-                val parts = historyItem.split("→").map { it.trim() }
-                if (parts.size == 2) {
-                    val baseCurrency = parts[0]
-                    val targetCurrency = parts[1]
-
-                    val valute = Valute(
-                        charCode = targetCurrency,
-                        name = targetCurrency,
-                        nominal = 1,
-                        value = "0.0",
-                        previous = "0.0"
-                    )
-
-                    val bundle = Bundle().apply {
-                        putParcelable("valute", valute)
-                        putString("baseCurrency", baseCurrency)
-                    }
-
-                    findNavController().navigate(
-                        R.id.action_navigation_history_to_detailsFragment,
-                        bundle
-                    )
+        // Адаптер списка истории с кликом и удалением
+        adapter = HistoryAdapter(
+            historyManager,
+            onClick = { item ->
+                // Переход на график валюты (DetailsFragment)
+                val valute = Valute(
+                    charCode = item.targetCurrency,
+                    name = item.targetCurrency,
+                    nominal = 1,
+                    value = "0.0",
+                    previous = "0.0"
+                )
+                val bundle = Bundle().apply {
+                    putParcelable("valute", valute)
+                    putString("baseCurrency", item.baseCurrency)
                 }
+                findNavController().navigate(
+                    R.id.action_navigation_history_to_detailsFragment,
+                    bundle
+                )
             },
-            onHistoryChanged = { loadHistory() }
+            onHistoryChanged = { loadHistory() } // при удалении обновляем UI
         )
 
         binding.recyclerViewHistory.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewHistory.adapter = adapter
 
+        // Загрузка истории при старте
         loadHistory()
 
+        // Очистка всей истории
         binding.buttonClearHistory.setOnClickListener {
             historyManager.clearHistory()
             loadHistory()
             Toast.makeText(requireContext(), "История очищена", Toast.LENGTH_SHORT).show()
         }
     }
+
+    // Загружает список истории из SharedPreferences и обновляет адаптер.
 
     private fun loadHistory() {
         val historyList = historyManager.getHistory().reversed()
@@ -85,7 +86,6 @@ class HistoryFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }
 
 
