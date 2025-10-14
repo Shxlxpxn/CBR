@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
 
     private var selectedBaseCurrency: String = "RUB"
     private val selectedCurrencies = mutableSetOf<String>()
-    private val favoriteCurrencies = mutableSetOf<String>()
+    private lateinit var favouritesManager: FavouritesManager
 
     private lateinit var conversionsAdapter: ConversionsAdapter
     private lateinit var historyManager: HistoryManager
@@ -52,14 +52,14 @@ class HomeFragment : Fragment() {
     private var ratesMap: Map<String, Double> = emptyMap()
     private var valutesList: List<Valute> = emptyList()
 
-    // Инициализация зависимостей через Dagger
+    // Dagger
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as App).appComponent.inject(this)
         historyManager = HistoryManager(context)
+        favouritesManager = FavouritesManager(context)
     }
 
-    // Загружаем пользовательские настройки (базовая валюта, размер страницы)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -67,20 +67,16 @@ class HomeFragment : Fragment() {
         pageSize = prefs.getString("page_size", "5")?.toIntOrNull() ?: 5
     }
 
-    // Подключаем layout
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    // Основная логика экрана
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Настройка списка конверсий
         conversionsAdapter = ConversionsAdapter { valute ->
             val bundle = Bundle().apply {
                 putParcelable("valute", valute)
@@ -95,7 +91,7 @@ class HomeFragment : Fragment() {
             itemAnimator = DefaultItemAnimator()
         }
 
-        // Подписка на данные ViewModel
+        // Подписки на ViewModel
         viewModel.currencyMap.observe(viewLifecycleOwner) { currencyMap ->
             ratesMap = currencyMap
             updateConversionsAndShowPage()
@@ -121,7 +117,6 @@ class HomeFragment : Fragment() {
             val baseValute = valutesList.find { it.charCode == selectedBaseCurrency }
                 ?: Valute(charCode = selectedBaseCurrency, name = selectedBaseCurrency, nominal = 1, value = "1.0", previous = "1.0")
 
-            // Сохраняем в историю объект с base/target
             historyManager.addToHistory(HistoryItem(baseValute.charCode, targetValute.charCode))
 
             val bundle = Bundle().apply {
@@ -131,11 +126,12 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_navigation_home_to_detailsFragment, bundle)
         }
 
-        // Кнопки избранного и сброса
+        // 🔹 Избранное
         binding.buttonFavorites.setOnClickListener {
-            if (favoriteCurrencies.isNotEmpty()) {
+            val favs = favouritesManager.loadFavourites()
+            if (favs.isNotEmpty()) {
                 selectedCurrencies.clear()
-                selectedCurrencies.addAll(favoriteCurrencies)
+                selectedCurrencies.addAll(favs)
                 updateConversionsAndShowPage()
             } else {
                 Toast.makeText(requireContext(), "Избранные валюты не выбраны", Toast.LENGTH_SHORT).show()
@@ -143,8 +139,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.buttonAddToFavorites.setOnClickListener {
-            favoriteCurrencies.clear()
-            favoriteCurrencies.addAll(selectedCurrencies)
+            favouritesManager.saveFavourites(selectedCurrencies.toList())
             Toast.makeText(requireContext(), "Избранные валюты сохранены", Toast.LENGTH_SHORT).show()
         }
 
@@ -154,7 +149,7 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), "Выбранные валюты сброшены", Toast.LENGTH_SHORT).show()
         }
 
-        // Кнопки пагинации
+        // Пагинация
         binding.buttonLoadMore.setOnClickListener {
             if (currentPage < maxPageIndex()) {
                 currentPage++
@@ -168,7 +163,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Обработка ошибок и загрузки
+        // Ошибки / загрузка
         viewModel.error.observe(viewLifecycleOwner) { error ->
             binding.textHome.text = error?.let { "Ошибка: $it" } ?: ""
         }
@@ -177,7 +172,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Настройка выпадающего списка валют
     private fun setupCurrencySpinner(codes: List<String>) {
         val baseAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item, codes)
         binding.spinnerFromCurrency.adapter = baseAdapter
@@ -190,6 +184,7 @@ class HomeFragment : Fragment() {
                 selectedBaseCurrency = codes[position]
                 updateConversionsAndShowPage()
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
@@ -215,7 +210,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Обновляем данные списка конверсий и отображаем текущую страницу
     private fun updateConversionsAndShowPage() {
         binding.recyclerViewConversions.animate().alpha(0f).setDuration(200).withEndAction {
             if (ratesMap.isEmpty() || selectedCurrencies.isEmpty()) {
@@ -247,7 +241,6 @@ class HomeFragment : Fragment() {
         }.start()
     }
 
-    // Отображение текущей страницы конверсий
     private fun showCurrentPage() {
         val fromIndex = currentPage * pageSize
         val toIndex = minOf(fromIndex + pageSize, conversionsList.size)

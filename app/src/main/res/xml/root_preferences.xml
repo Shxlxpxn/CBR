@@ -25,4 +25,12 @@
         android:summary="Переключение светлой и тёмной темы"
         android:defaultValue="false" />
 
+    <ListPreference
+        android:key="language"
+        android:title="Язык приложения"
+        android:entries="@array/language_entries"
+        android:entryValues="@array/language_values"
+        android:defaultValue="ru"
+        android:summary="%s" />
+
 </PreferenceScreen>

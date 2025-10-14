@@ -58,4 +58,14 @@
         <item>10</item>
         <item>20</item>
     </string-array>
+
+    <string-array name="language_entries">
+        <item>Русский</item>
+        <item>English</item>
+    </string-array>
+
+    <string-array name="language_values">
+        <item>ru</item>
+        <item>en</item>
+    </string-array>
 </resources>
