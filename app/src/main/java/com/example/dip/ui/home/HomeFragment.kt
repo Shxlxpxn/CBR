@@ -2,15 +2,12 @@ package com.example.dip.ui.home
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +20,6 @@ import com.example.dip.R
 import com.example.dip.data.api.Valute
 import com.example.dip.data.rv_adapters.ConversionsAdapter
 import com.example.dip.databinding.FragmentHomeBinding
-import com.example.dip.ui.details.DetailsFragment
 import com.example.dip.ui.history.HistoryItem
 import com.example.dip.ui.history.HistoryManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

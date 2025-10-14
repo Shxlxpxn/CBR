@@ -2,7 +2,7 @@ package com.example.dip.utils
 
 import android.content.Context
 import android.content.res.Configuration
-import java.util.*
+import java.util.Locale
 import java.util.Locale.setDefault
 
 
