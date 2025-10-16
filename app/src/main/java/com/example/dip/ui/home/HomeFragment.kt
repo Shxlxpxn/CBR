@@ -37,18 +37,15 @@ class HomeFragment : Fragment() {
     private var selectedBaseCurrency: String = "RUB"
     private val selectedCurrencies = mutableSetOf<String>()
     private lateinit var favouritesManager: FavouritesManager
-
     private lateinit var conversionsAdapter: ConversionsAdapter
     private lateinit var historyManager: HistoryManager
 
     private var currentPage = 0
     private var pageSize: Int = 5
     private var conversionsList: List<Valute> = emptyList()
-
     private var ratesMap: Map<String, Double> = emptyMap()
     private var valutesList: List<Valute> = emptyList()
 
-    // Dagger
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as App).appComponent.inject(this)
@@ -64,7 +61,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
@@ -87,7 +84,7 @@ class HomeFragment : Fragment() {
             itemAnimator = DefaultItemAnimator()
         }
 
-        // Подписки на ViewModel
+        // Подписки
         viewModel.currencyMap.observe(viewLifecycleOwner) { currencyMap ->
             ratesMap = currencyMap
             updateConversionsAndShowPage()
@@ -99,19 +96,19 @@ class HomeFragment : Fragment() {
             setupCurrencySpinner(allCodes)
         }
 
-        // Кнопка "Показать график"
+        // Показать график
         binding.buttonShowChart.setOnClickListener {
             if (selectedCurrencies.isEmpty()) {
-                Toast.makeText(requireContext(), "Выберите валюту для просмотра графика", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_select_currency), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val targetCode = selectedCurrencies.first()
             val targetValute = valutesList.find { it.charCode == targetCode }
-                ?: Valute(charCode = targetCode, name = targetCode, nominal = 1, value = "1.0", previous = "1.0")
+                ?: Valute(targetCode, targetCode, 1, "1.0", "1.0")
 
             val baseValute = valutesList.find { it.charCode == selectedBaseCurrency }
-                ?: Valute(charCode = selectedBaseCurrency, name = selectedBaseCurrency, nominal = 1, value = "1.0", previous = "1.0")
+                ?: Valute(selectedBaseCurrency, selectedBaseCurrency, 1, "1.0", "1.0")
 
             historyManager.addToHistory(HistoryItem(baseValute.charCode, targetValute.charCode))
 
@@ -122,7 +119,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_navigation_home_to_detailsFragment, bundle)
         }
 
-        // 🔹 Избранное
+        // Избранное
         binding.buttonFavorites.setOnClickListener {
             val favs = favouritesManager.loadFavourites()
             if (favs.isNotEmpty()) {
@@ -130,19 +127,19 @@ class HomeFragment : Fragment() {
                 selectedCurrencies.addAll(favs)
                 updateConversionsAndShowPage()
             } else {
-                Toast.makeText(requireContext(), "Избранные валюты не выбраны", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_no_favorites), Toast.LENGTH_SHORT).show()
             }
         }
 
         binding.buttonAddToFavorites.setOnClickListener {
             favouritesManager.saveFavourites(selectedCurrencies.toList())
-            Toast.makeText(requireContext(), "Избранные валюты сохранены", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_favorites_saved), Toast.LENGTH_SHORT).show()
         }
 
         binding.buttonReset.setOnClickListener {
             selectedCurrencies.clear()
             updateConversionsAndShowPage()
-            Toast.makeText(requireContext(), "Выбранные валюты сброшены", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_selection_reset), Toast.LENGTH_SHORT).show()
         }
 
         // Пагинация
@@ -159,9 +156,12 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Ошибки / загрузка
+        // Ошибки и загрузка
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            binding.textHome.text = error?.let { "Ошибка: $it" } ?: ""
+            error?.let {
+                val message = it.ifBlank { getString(R.string.unknown_error) }
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            }
         }
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressPagination.visibility = if (loading) View.VISIBLE else View.GONE
@@ -169,7 +169,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupCurrencySpinner(codes: List<String>) {
-        val baseAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item, codes)
+        val names = resources.getStringArray(R.array.currency_names)
+        val displayNames = codes.map { code ->
+            val index = resources.getStringArray(R.array.currency_codes).indexOf(code)
+            if (index >= 0 && index < names.size) names[index] else code
+        }
+
+        val baseAdapter = ArrayAdapter(requireContext(), R.layout.spinner_item, displayNames)
         binding.spinnerFromCurrency.adapter = baseAdapter
 
         val defaultIndex = codes.indexOf(selectedBaseCurrency).takeIf { it >= 0 } ?: 0
@@ -185,23 +191,24 @@ class HomeFragment : Fragment() {
         }
 
         binding.buttonSelectCurrencies.setOnClickListener {
-            val currenciesArray = codes.toTypedArray()
+            val currenciesArray = displayNames.toTypedArray()
             val tempSelected = selectedCurrencies.toMutableSet()
             val checkedItems = codes.map { tempSelected.contains(it) }.toBooleanArray()
 
             MaterialAlertDialogBuilder(requireContext(), R.style.CustomAlertDialogTheme)
-                .setTitle("Выберите валюты")
+                .setTitle(getString(R.string.dialog_select_currencies_title))
                 .setMultiChoiceItems(currenciesArray, checkedItems) { _, which, isChecked ->
-                    if (isChecked) tempSelected.add(currenciesArray[which])
-                    else tempSelected.remove(currenciesArray[which])
+                    val code = codes[which]
+                    if (isChecked) tempSelected.add(code)
+                    else tempSelected.remove(code)
                 }
-                .setPositiveButton("Выбрать") { dialog, _ ->
+                .setPositiveButton(getString(R.string.dialog_positive_select)) { dialog, _ ->
                     selectedCurrencies.clear()
                     selectedCurrencies.addAll(tempSelected)
                     updateConversionsAndShowPage()
                     dialog.dismiss()
                 }
-                .setNegativeButton("Отмена", null)
+                .setNegativeButton(getString(R.string.dialog_negative_cancel), null)
                 .show()
         }
     }
@@ -221,11 +228,11 @@ class HomeFragment : Fragment() {
                 val valute = valutesList.find { it.charCode == code }
                 rate?.let {
                     Valute(
-                        charCode = code,
-                        name = valute?.name ?: code,
-                        nominal = valute?.nominal ?: 1,
-                        value = (it / baseRate).toString(),
-                        previous = valute?.previous ?: ""
+                        code,
+                        valute?.name ?: code,
+                        valute?.nominal ?: 1,
+                        (it / baseRate).toString(),
+                        valute?.previous ?: ""
                     )
                 }
             }.sortedBy { it.charCode }
@@ -243,9 +250,9 @@ class HomeFragment : Fragment() {
         val pageData = if (fromIndex < toIndex) conversionsList.subList(fromIndex, toIndex) else emptyList()
 
         binding.textHome.text = if (conversionsList.isEmpty()) {
-            "Нет данных для выбранных валют"
+            getString(R.string.no_data)
         } else {
-            "Курсы валют относительно $selectedBaseCurrency (стр. ${currentPage + 1}/${maxPages()})"
+            getString(R.string.currency_rates_format, selectedBaseCurrency, currentPage + 1, maxPages())
         }
 
         conversionsAdapter.setConversions(pageData)

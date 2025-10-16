@@ -1,5 +1,6 @@
 package com.example.dip
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -11,6 +12,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.dip.databinding.ActivityMainBinding
 import com.example.dip.ui.home.HomeViewModel
+import com.example.dip.utils.LocaleHelper
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -28,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar?.title = "Главная"
+        supportActionBar?.title = getString(R.string.title_home)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         val navView: BottomNavigationView = binding.navView
@@ -48,6 +50,11 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        val context = LocaleHelper.applyLocale(newBase)
+        super.attachBaseContext(context)
     }
 }
 

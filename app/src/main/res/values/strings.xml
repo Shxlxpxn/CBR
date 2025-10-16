@@ -1,6 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DIP</string>
-    <string name="title_home">Конвертор валют</string>
+    <string name="title_home">Главное меню</string>
     <string name="title_history">История</string>
     <string name="title_notifications">Уведомления</string>
     <string name="title_settings">Настройки</string>
@@ -18,4 +18,43 @@
     <string name="previous_value">Предыдущее значение</string>
     <string name="chart_label">Курс за %1$d дней</string>
     <string name="back">Назад</string>
+    <string name="app_name">Курсы ЦБ РФ</string>
+    <string name="save_to_favourites">Добавить в избранное</string>
+    <string name="delete">Удалить</string>
+    <string name="dark_theme">Тёмная тема</string>
+    <string name="theme_desc">Переключение светлой и тёмной темы</string>
+    <string name="currency_amount_per_page">Количество валют на странице</string>
+    <string name="toast_select_currency">Выберите валюту для просмотра графика</string>
+    <string name="toast_no_favorites">Избранные валюты не выбраны</string>
+    <string name="toast_favorites_saved">Избранные валюты сохранены</string>
+    <string name="toast_selection_reset">Выбранные валюты сброшены</string>
+    <string name="currency_rates_format">Курсы валют относительно %1$s (стр. %2$d/%3$d)</string>
+    <string name="error_format">Ошибка: %1$s</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="pref_language_title">Язык приложения</string>
+    <string name="pref_language_summary">Выберите язык интерфейса</string>
+    <string name="lang_russian">Русский</string>
+    <string name="lang_english">Английский</string>
+    <string name="select_currency">Выберите валюты</string>
+    <string name="no_favourites">Избранные валюты не выбраны</string>
+    <string name="favourites_saved">Избранные валюты сохранены</string>
+    <string name="currencies_reset">Выбранные валюты сброшены</string>
+    <string name="no_data">Нет данных для выбранных валют</string>
+    <string name="error">Ошибка: %1$s</string>
+    <string name="choose_currencies">Выберите валюты</string>
+    <string name="select_base_currency">Выберите основную валюту</string>
+    <string name="add_to_favorites">Добавить в избранное</string>
+    <string name="favorites">Избранное</string>
+    <string name="show_chart">Показать график</string>
+    <string name="reset">Сбросить</string>
+    <string name="load_more">Загрузить ещё</string>
+    <string name="load_prev">Предыдущая страница</string>
+    <string name="error_prefix">Ошибка:</string>
+    <string name="currency_rates_page">Курс обмена в зависимости от %1$s (страница %2$d/%3$d)</string>
+    <string name="toast_select_currency_for_chart">Пожалуйста выберите валюту для просмотра</string>
+    <string name="toast_currencies_reset">Избранные валюты сброшены</string>
+    <string name="dialog_select_currencies_title">Выберите валюты</string>
+    <string name="dialog_positive_select">Выбрать</string>
+    <string name="dialog_negative_cancel">Отмена</string>
+    <string name="history_item_deleted">Запись удалена</string>
 </resources>

@@ -38,7 +38,11 @@ class HistoryAdapter(
             buttonDelete.setOnClickListener {
                 historyManager.removeFromHistory(item)
                 onHistoryChanged?.invoke()
-                Toast.makeText(itemView.context, "Запись удалена", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    itemView.context,
+                    itemView.context.getString(R.string.history_item_deleted),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

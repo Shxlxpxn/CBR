@@ -1,13 +1,13 @@
 package com.example.dip.ui.settings
 
+
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
 import com.example.dip.R
-import com.example.dip.utils.LanguageManager
+import com.example.dip.utils.LocaleHelper
 
 class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
@@ -17,11 +17,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         findPreference<ListPreference>("base_currency")
             ?.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+
         findPreference<ListPreference>("page_size")
             ?.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
-        findPreference<SwitchPreferenceCompat>("dark_theme")
 
-        findPreference<ListPreference>("language")
+        findPreference<ListPreference>("app_language")
             ?.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
     }
 
@@ -45,12 +45,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
                     if (isDark) AppCompatDelegate.MODE_NIGHT_YES
                     else AppCompatDelegate.MODE_NIGHT_NO
                 )
-                requireActivity().recreate()
             }
 
-            "language" -> {
-                val lang = sharedPreferences?.getString("language", "ru") ?: "ru"
-                LanguageManager.setLocale(requireContext(), lang)
+            "app_language" -> {
+                val lang = sharedPreferences?.getString("app_language", "ru") ?: "ru"
+                LocaleHelper.applyLocale(requireContext())
                 requireActivity().recreate()
             }
         }

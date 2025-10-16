@@ -1,28 +1,24 @@
 package com.example.dip
 
 import android.app.Application
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.preference.PreferenceManager
+import android.content.Context
 import com.example.dip.di.AppComponent
 import com.example.dip.di.DaggerAppComponent
+import com.example.dip.utils.LocaleHelper
 
 class App : Application() {
 
-    val appComponent: AppComponent by lazy {
-        DaggerAppComponent.builder()
-            .applicationContext(this)
-            .build()
-    }
+    lateinit var appComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
+        appComponent = DaggerAppComponent.builder()
+            .applicationContext(this)
+            .build()
+        LocaleHelper.applyLocale(this)
+    }
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val darkThemeEnabled = prefs.getBoolean("dark_theme", false)
-
-        AppCompatDelegate.setDefaultNightMode(
-            if (darkThemeEnabled) AppCompatDelegate.MODE_NIGHT_YES
-            else AppCompatDelegate.MODE_NIGHT_NO
-        )
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base?.let { LocaleHelper.wrap(it) })
     }
 }

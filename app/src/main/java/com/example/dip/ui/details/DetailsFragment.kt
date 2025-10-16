@@ -52,14 +52,12 @@ class DetailsFragment : Fragment() {
         return binding.root
     }
 
-    // Чтение аргументов, отображение данных и загрузка графика.
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
-            title = "Детали валюты"
+            title = getString(R.string.details_title)
         }
         setHasOptionsMenu(true)
 
@@ -74,26 +72,29 @@ class DetailsFragment : Fragment() {
 
         val provided = valuteArg
         if (provided == null) {
-            binding.detailTitle.text = "Нет данных"
-            binding.detailText.text = "Выберите валюту"
+            binding.detailTitle.text = getString(R.string.no_data_title)
+            binding.detailText.text = getString(R.string.no_data_message)
             binding.detailChart.visibility = View.GONE
             return
         }
 
         // Заголовок с валютами
-        binding.detailTitle.text = "${provided.charCode} относительно $baseCurrency"
+        binding.detailTitle.text = getString(
+            R.string.currency_relative_to,
+            provided.charCode,
+            baseCurrency
+        )
 
-        // Кнопка "Назад" (если присутствует в layout)
-        binding.buttonBack?.apply {
+        // Кнопка "Назад"
+        binding.buttonBack.apply {
             visibility = View.VISIBLE
             setOnClickListener { findNavController().navigateUp() }
         }
 
-        // Загрузка исторических данных курса и построение графика
         lifecycleScope.launch {
             val targetHistory = fetchHistoryRates(provided.charCode, 7)
             val baseHistory = if (baseCurrency == "RUB") {
-                List(targetHistory.size) { 1.0 } // RUB относительно RUB = 1
+                List(targetHistory.size) { 1.0 }
             } else {
                 fetchHistoryRates(baseCurrency, 7)
             }
@@ -107,7 +108,6 @@ class DetailsFragment : Fragment() {
                 return@launch
             }
 
-            // Считаем относительные значения target/base
             val relativeHistory = targetHistory.zip(baseHistory).map { (t, b) ->
                 if (b == 0.0) t else t / b
             }
@@ -118,7 +118,6 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    // Загружает курсы валюты за N дней с сайта ЦБ РФ.
     private suspend fun fetchHistoryRates(code: String, days: Int): List<Double> {
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.US)
         val today = Calendar.getInstance()
@@ -133,14 +132,13 @@ class DetailsFragment : Fragment() {
                 }
                 parseRateFromXml(xml, code)?.let { rates.add(it) }
             } catch (e: Exception) {
-                Log.e("DetailsFragment", "Ошибка загрузки курса на $date", e)
+                Log.e("DetailsFragment", getString(R.string.data_load_error), e)
             }
             today.add(Calendar.DAY_OF_MONTH, -1)
         }
         return rates.reversed()
     }
 
-    // Парсит XML-ответ и извлекает курс нужной валюты
     private fun parseRateFromXml(xml: String, code: String): Double? {
         try {
             val factory = XmlPullParserFactory.newInstance()
@@ -177,12 +175,11 @@ class DetailsFragment : Fragment() {
                 eventType = parser.next()
             }
         } catch (e: Exception) {
-            Log.e("DetailsFragment", "Ошибка парсинга XML", e)
+            Log.e("DetailsFragment", getString(R.string.data_load_error), e)
         }
         return null
     }
 
-    // Обновляет текстовую информацию и отображает график на экране.
     private suspend fun updateDetailsAndChart(
         nominal: Int,
         current: Double?,
@@ -190,12 +187,14 @@ class DetailsFragment : Fragment() {
         history: List<Double>
     ) = withContext(Dispatchers.Main) {
         val detailsText = SpannableStringBuilder()
-            .append(createBold("Базовая валюта: ")).append("$baseCurrency\n\n")
-            .append(createBold("Номинал: ")).append("$nominal\n\n")
-            .append(createBold("Текущее значение: "))
+            .append(createBold("${getString(R.string.base_currency)}: "))
+            .append("$baseCurrency\n\n")
+            .append(createBold("${getString(R.string.nominal)}: "))
+            .append("$nominal\n\n")
+            .append(createBold("${getString(R.string.current_value)}: "))
             .append(current?.let { decimalFormat.format(it) } ?: "—")
             .append("\n\n")
-            .append(createBold("Предыдущее значение: "))
+            .append(createBold("${getString(R.string.previous_value)}: "))
             .append(previous?.let { decimalFormat.format(it) } ?: "—")
 
         binding.detailText.text = detailsText
@@ -203,8 +202,6 @@ class DetailsFragment : Fragment() {
         if (history.isNotEmpty()) showChart(history)
         else binding.detailChart.visibility = View.GONE
     }
-
-    // Отображает график изменения курса с учётом темы оформления.
 
     private fun showChart(history: List<Double>) {
         val entries = history.mapIndexed { i, v -> Entry(i.toFloat(), v.toFloat()) }
@@ -219,7 +216,7 @@ class DetailsFragment : Fragment() {
         val gridAlpha = if (isNight) 0.14f else 0.08f
         val gridColor = ColorUtils.setAlphaComponent(onSurface, (255 * gridAlpha).toInt())
 
-        val dataSet = LineDataSet(entries, "Курс за ${history.size} дней").apply {
+        val dataSet = LineDataSet(entries, getString(R.string.chart_label, history.size)).apply {
             setDrawValues(false)
             setDrawCircles(true)
             lineWidth = 2f
@@ -265,3 +262,4 @@ class DetailsFragment : Fragment() {
         _binding = null
     }
 }
+

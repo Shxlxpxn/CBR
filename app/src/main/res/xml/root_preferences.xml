@@ -3,7 +3,7 @@
     <!-- Выбор базовой валюты -->
     <ListPreference
         android:key="base_currency"
-        android:title="Базовая валюта"
+        android:title="@string/base_currency"
         android:entries="@array/currency_names"
         android:entryValues="@array/currency_codes"
         android:defaultValue="RUB"
@@ -12,7 +12,7 @@
     <!-- Количество валют на странице -->
     <ListPreference
         android:key="page_size"
-        android:title="Количество валют на странице"
+        android:title="@string/currency_amount_per_page"
         android:entries="@array/page_size_entries"
         android:entryValues="@array/page_size_values"
         android:defaultValue="5"
@@ -21,16 +21,17 @@
     <!-- Тёмная тема -->
     <SwitchPreferenceCompat
         android:key="dark_theme"
-        android:title="Тёмная тема"
-        android:summary="Переключение светлой и тёмной темы"
+        android:title="@string/dark_theme"
+        android:summary="@string/theme_desc"
         android:defaultValue="false" />
 
+
     <ListPreference
-        android:key="language"
-        android:title="Язык приложения"
+        android:key="app_language"
+        android:title="@string/pref_language_title"
+        android:summary="@string/pref_language_summary"
         android:entries="@array/language_entries"
         android:entryValues="@array/language_values"
-        android:defaultValue="ru"
-        android:summary="%s" />
+        android:defaultValue="ru" />
 
 </PreferenceScreen>

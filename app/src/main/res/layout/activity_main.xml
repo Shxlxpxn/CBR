@@ -19,7 +19,7 @@
             android:background="?attr/colorPrimary"
             app:titleTextColor="?attr/colorOnPrimary"
             app:subtitleTextColor="?attr/colorOnPrimary"
-            app:title="Конвертор валют" />
+            app:title="@string/app_name" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
