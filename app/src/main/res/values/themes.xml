@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 🌞 Основная светлая тема -->
+    <style name="Theme.DIP" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Основные цвета -->
+        <item name="colorPrimary">#A09CED</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#00B894</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#000000</item>
+        <item name="android:colorBackground">#FFFFFF</item>
+        <item name="colorOnBackground">#1C1B1F</item>
+
+        <!-- Навигация и текст -->
+        <item name="android:navigationBarColor">@color/color_background</item>
+        <item name="android:textColorPrimary">?attr/colorOnBackground</item>
+        <item name="android:textColorSecondary">#6b6b6b</item>
+
+        <!-- Подключаем кастомную тему диалога -->
+        <item name="alertDialogTheme">@style/CustomAlertDialogTheme</item>
+
+        <!-- Toolbar -->
+        <item name="toolbarStyle">@style/Widget.DIP.Toolbar</item>
+    </style>
+
+    <!-- 🟣 Тема тулбара -->
+    <style name="Widget.DIP.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- 💬 Кастомная тема диалога -->
+    <style name="CustomAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <!-- фон диалога возьмём из android:colorBackground (который у тебя задан в теме) -->
+        <item name="colorSurface">?android:colorBackground</item>
+        <!-- текст/контент -->
+        <item name="colorOnSurface">?attr/colorOnBackground</item>
+
+        <!-- кнопки диалога -->
+        <item name="buttonBarPositiveButtonStyle">@style/DialogButtonStyle_Light</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DialogButtonStyle_Light</item>
+    </style>
+
+    <style name="DialogButtonStyle_Light" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <!-- чёрный текст кнопок в светлой теме -->
+        <item name="android:textColor">#000000</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+</resources>

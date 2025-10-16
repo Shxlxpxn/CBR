@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 🌙 Основная тёмная тема -->
+    <style name="Theme.DIP" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Основные цвета -->
+        <item name="colorPrimary">#4A47A3</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#1DB954</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSurface">#1C1B1F</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="android:colorBackground">#1C1B1F</item>
+        <item name="colorOnBackground">#EAEAEA</item>
+
+        <!-- Навигация и текст -->
+        <item name="android:navigationBarColor">#1C1B1F</item>
+        <item name="android:textColorPrimary">?attr/colorOnBackground</item>
+        <item name="android:textColorSecondary">#B3B3B3</item>
+
+        <!-- Подключаем кастомную тему диалога -->
+        <item name="alertDialogTheme">@style/CustomAlertDialogTheme</item>
+
+        <!-- Toolbar -->
+        <item name="toolbarStyle">@style/Widget.DIP.Toolbar</item>
+    </style>
+
+    <!-- 🟣 Тема тулбара -->
+    <style name="Widget.DIP.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- 💬 Кастомная тема диалога -->
+    <style name="CustomAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorSurface">?android:colorBackground</item>
+        <item name="colorOnSurface">?attr/colorOnBackground</item>
+
+        <item name="buttonBarPositiveButtonStyle">@style/DialogButtonStyle_Dark</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DialogButtonStyle_Dark</item>
+    </style>
+
+    <style name="DialogButtonStyle_Dark" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <!-- белый текст кнопок в тёмной теме -->
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+</resources>

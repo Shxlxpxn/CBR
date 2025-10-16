@@ -1,0 +1,16 @@
+<resources>
+    <color name="color_background">#121212</color>
+    <color name="color_surface">#1E1E1E</color>
+    <color name="color_on_background">#E6E1E5</color>
+    <color name="color_on_surface">#E6E1E5</color>
+    <color name="color_secondary_text">#A0A0A0</color>
+    <color name="color_accent">#80CBC4</color>
+    <color name="color_accent2">#B39DDB</color>
+    <color name="color_text">#FFFFFF</color>
+    <color name="icon_inactive">#757575</color>
+    <color name="icon_active">#B39DDB</color>
+    <color name="spinner_item_bg">#1E1E1E</color>
+    <color name="spinner_dropdown_bg">#2A2A2A</color>
+    <color name="spinner_text">#E6E1E5</color>
+
+</resources>

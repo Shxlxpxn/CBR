@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Валюты -->
+    <string-array name="currency_codes">
+        <item>RUB</item>
+        <item>USD</item>
+        <item>EUR</item>
+        <item>GBP</item>
+        <item>CHF</item>
+        <item>JPY</item>
+        <item>CNY</item>
+        <item>AUD</item>
+        <item>CAD</item>
+        <item>KZT</item>
+        <item>SEK</item>
+        <item>NOK</item>
+        <item>TRY</item>
+        <item>INR</item>
+        <item>BRL</item>
+        <item>ZAR</item>
+        <item>HKD</item>
+        <item>SGD</item>
+        <item>PLN</item>
+        <item>HUF</item>
+        <item>THB</item>
+        <item>CZK</item>
+        <item>KRW</item>
+        <item>DKK</item>
+        <item>BYN</item>
+        <item>BGN</item>
+        <item>RON</item>
+        <item>IDR</item>
+        <item>MYR</item>
+        <item>MXN</item>
+        <item>NZD</item>
+        <item>AMD</item>
+        <item>UZS</item>
+        <item>AZN</item>
+        <item>MDL</item>
+        <item>GEL</item>
+        <item>TJS</item>
+        <item>TMT</item>
+        <item>RSD</item>
+        <item>ILS</item>
+        <item>PHP</item>
+        <item>AED</item>
+        <item>BDT</item>
+        <item>BHD</item>
+        <item>BOB</item>
+        <item>CUP</item>
+        <item>DZD</item>
+        <item>EGP</item>
+        <item>ETB</item>
+        <item>IRR</item>
+        <item>KGS</item>
+        <item>MMK</item>
+        <item>MNT</item>
+        <item>NGN</item>
+        <item>OMR</item>
+        <item>QAR</item>
+        <item>SAR</item>
+        <item>UAH</item>
+        <item>VND</item>
+        <item>XDR</item>
+    </string-array>
+
+    <string-array name="currency_names">
+        <item>Российский рубль</item>
+        <item>Доллар США</item>
+        <item>Евро</item>
+        <item>Фунт стерлингов</item>
+        <item>Швейцарский франк</item>
+        <item>Японская иена</item>
+        <item>Китайский юань</item>
+        <item>Австралийский доллар</item>
+        <item>Канадский доллар</item>
+        <item>Казахстанский тенге</item>
+        <item>Шведская крона</item>
+        <item>Норвежская крона</item>
+        <item>Турецкая лира</item>
+        <item>Индийская рупия</item>
+        <item>Бразильский реал</item>
+        <item>Южноафриканский рэнд</item>
+        <item>Гонконгский доллар</item>
+        <item>Сингапурский доллар</item>
+        <item>Польский злотый</item>
+        <item>Венгерский форинт</item>
+        <item>Тайский бат</item>
+        <item>Чешская крона</item>
+        <item>Вон Республики Корея</item>
+        <item>Датская крона</item>
+        <item>Белорусский рубль</item>
+        <item>Болгарский лев</item>
+        <item>Румынский лей</item>
+        <item>Индонезийская рупия</item>
+        <item>Малайзийский ринггит</item>
+        <item>Мексиканское песо</item>
+        <item>Новозеландский доллар</item>
+        <item>Армянский драм</item>
+        <item>Узбекский сум</item>
+        <item>Азербайджанский манат</item>
+        <item>Молдавский лей</item>
+        <item>Грузинский лари</item>
+        <item>Таджикский сомони</item>
+        <item>Туркменский манат</item>
+        <item>Сербский динар</item>
+        <item>Израильский шекель</item>
+        <item>Филиппинское песо</item>
+        <item>Дирхам ОАЭ</item>
+        <item>Бангладешская така</item>
+        <item>Бахрейнский динар</item>
+        <item>Боливийский боливиано</item>
+        <item>Кубинское песо</item>
+        <item>Алжирский динар</item>
+        <item>Египетский фунт</item>
+        <item>Эфиопский быр</item>
+        <item>Иранский риал</item>
+        <item>Киргизский сом</item>
+        <item>Мьянманский кьят</item>
+        <item>Монгольский тугрик</item>
+        <item>Найра Нигерии</item>
+        <item>Оманский риал</item>
+        <item>Катарский риал</item>
+        <item>Саудовский риял</item>
+        <item>Украинская гривна</item>
+        <item>Вьетнамский донг</item>
+        <item>Специальные права заимствования (SDR)</item>
+    </string-array>
+
+
+    <string-array name="page_size_entries">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="page_size_values">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+
+    <string-array name="language_entries">
+        <item>Русский</item>
+        <item>English</item>
+    </string-array>
+
+    <string-array name="language_values">
+        <item>ru</item>
+        <item>en</item>
+    </string-array>
+</resources>
